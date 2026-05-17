@@ -36,7 +36,8 @@ echo
 echo "✦ Setup complete!"
 echo
 echo "  Next steps:"
-echo "    1. Start Ollama:   ollama serve"
-echo "    2. Launch agent:   cd onyx-agent && python cli.py"
+echo "    1. Start Ollama:   ollama serve &"
+echo "    2. CLI mode:       python cli.py"
+echo "    3. Telegram mode:  python telegram_bot.py <BOT_TOKEN>"
 echo
-echo "  Or in one command:  ollama serve & python cli.py"
+echo "  Get a bot token from @BotFather on Telegram for Telegram mode."
