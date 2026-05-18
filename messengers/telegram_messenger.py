@@ -27,6 +27,7 @@ class TelegramMessenger(Messenger):
         """Call Telegram API."""
         if not self._http:
             return None
+        import httpx
         try:
             r = await self._http.post(
                 f"{self._base}/{method}",
