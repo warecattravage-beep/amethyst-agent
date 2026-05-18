@@ -511,6 +511,9 @@ class OnyxEngine:
         # Proactive check-in loop
         asyncio.create_task(self._proactive_loop())
 
+        # Auto-update loop (check every 30 min)
+        asyncio.create_task(self._auto_update_loop())
+
         # Main message processing loop
         await self._message_loop()
 
@@ -621,6 +624,33 @@ class OnyxEngine:
                 log.error("Message processing error: %s", e)
 
         await self._shutdown()
+
+    async def _auto_update_loop(self):
+        """Auto-update from GitHub every 30 min."""
+        import subprocess
+        repo = Path(__file__).resolve().parent.parent
+        while self._running:
+            await asyncio.sleep(1800)
+            try:
+                r = subprocess.run(
+                    ["git", "pull"], capture_output=True, text=True, timeout=30,
+                    cwd=str(repo),
+                )
+                if r.returncode == 0 and r.stdout.strip():
+                    if "Already up to date." not in r.stdout:
+                        log.info("Auto-update: new changes pulled!")
+                        # Notify all messengers
+                        for m in self.messengers.values():
+                            try:
+                                await m.send("", "🔄 Onyx auto-updated — restarting...")
+                            except Exception:
+                                pass
+                        log.info("Auto-update: restarting...")
+                        self._running = False
+                        # Replace process with fresh start
+                        os.execv(sys.executable, [sys.executable, str(repo / "onyx.py"), "start"])
+            except Exception as e:
+                log.debug("Auto-update check failed: %s", e)
 
     async def _shutdown(self):
         """Gracefully shut down all components."""
