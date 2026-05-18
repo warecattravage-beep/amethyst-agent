@@ -14,20 +14,29 @@ from __future__ import annotations
 import argparse
 import asyncio
 import logging
+import os
 import sys
 from pathlib import Path
 
-# Add project root to path
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-
-from core.config import Config
-from core.engine import OnyxEngine
+ROOT = Path(__file__).resolve().parent
+sys.path.insert(0, str(ROOT))
 
 log = logging.getLogger("onyx")
 
 
+# ── Platform detection ──
+
+def _is_termux() -> bool:
+    """Detect if running in Termux (Android)."""
+    return bool(os.environ.get("TERMUX_VERSION")) or "/data/data/com.termux" in str(Path.cwd())
+
+
+# ── Commands ──
+
 def cmd_start(args):
     """Start the Onyx Agent."""
+    from core.config import Config
+    from core.engine import OnyxEngine
     engine = OnyxEngine(args.config)
     try:
         asyncio.run(engine.run())
@@ -40,13 +49,15 @@ def cmd_start(args):
 
 def cmd_setup(args):
     """Run the setup wizard."""
-    from dashboard.dashboard import run_setup
+    from core.config import Config
+    from core.setup_wizard import run_setup
     config = Config(args.config)
     run_setup(config)
 
 
 def cmd_status(args):
     """Show the dashboard status."""
+    from core.config import Config
     from dashboard.dashboard import show_status
     config = Config(args.config)
     show_status(config)
@@ -54,6 +65,7 @@ def cmd_status(args):
 
 def cmd_config(args):
     """Open config in editor."""
+    from core.config import Config
     from dashboard.dashboard import edit_config
     config = Config(args.config)
     edit_config(config)
@@ -61,20 +73,14 @@ def cmd_config(args):
 
 def cmd_logs(args):
     """Show recent logs."""
+    from core.config import Config
     from dashboard.dashboard import show_logs
     config = Config(args.config)
     show_logs(config, args.lines)
 
 
-def _is_termux() -> bool:
-    """Detect if running in Termux (Android)."""
-    return bool(os.environ.get("TERMUX_VERSION")) or "/data/data/com.termux" in str(Path.cwd())
-
-
 def cmd_dashboard(args):
     """Launch the dashboard — Kivy GUI on desktop, web server on Termux."""
-    sys.path.insert(0, str(Path(__file__).resolve().parent))
-
     if _is_termux() or args.web:
         from dashboard.web_dashboard import run as web_run
         web_run(args.config)
@@ -91,6 +97,8 @@ def cmd_dashboard(args):
 def cmd_help():
     print(__doc__.strip())
 
+
+# ── Main ──
 
 def main():
     parser = argparse.ArgumentParser(

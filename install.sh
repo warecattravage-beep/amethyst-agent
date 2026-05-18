@@ -123,7 +123,7 @@ cd "$SCRIPT_DIR"
 
 if [ ! -f "config.json" ]; then
     echo -e "\n  ${YELLOW}Creating default config.json...${NC}"
-    if $PYTHON -c "from core.config import Config; Config('config.json')" 2>/dev/null; then
+    if $PYTHON -c "import sys; sys.path.insert(0, '.'); from core.config import Config; Config('config.json')" 2>/dev/null; then
         echo -e "  ${GREEN}✓ Default config created${NC}"
     else
         cat > config.json << 'EOF'

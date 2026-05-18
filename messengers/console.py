@@ -6,10 +6,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from pathlib import Path
-
-from rich.console import Console as RichConsole
-from rich.markdown import Markdown
-from rich.panel import Panel
+from typing import Any
 
 from core.messenger import Messenger
 
@@ -17,16 +14,29 @@ log = logging.getLogger("onyx.console")
 
 
 class ConsoleMessenger(Messenger):
-    """Local terminal chat interface using rich."""
+    """Local terminal chat interface using rich (lazy import)."""
 
     def __init__(self, config: dict):
         super().__init__("console", config)
-        self.rich = RichConsole()
+        self.rich = None
         self.prompt = config.get("prompt", "onyx> ")
 
+    def _get_rich(self):
+        """Lazy-load rich to avoid import failures on machines without it."""
+        if self.rich is None:
+            from rich.console import Console as RichConsole
+            from rich.markdown import Markdown
+            from rich.panel import Panel
+            self._RichConsole = RichConsole
+            self._Markdown = Markdown
+            self._Panel = Panel
+            self.rich = RichConsole()
+        return self.rich
+
     async def start(self):
+        rich = self._get_rich()
         self._running = True
-        self.rich.print(Panel(
+        rich.print(self._Panel(
             "✦ Onyx Agent — Console Mode\n"
             "Type your messages. /help for commands, /quit to exit.",
             title="Onyx",
@@ -36,18 +46,20 @@ class ConsoleMessenger(Messenger):
 
     async def stop(self):
         self._running = False
-        self.rich.print("\n[yellow]Goodbye![/]")
+        if self.rich:
+            self.rich.print("\n[yellow]Goodbye![/]")
         log.info("Console messenger stopped")
 
     async def send(self, target: str, text: str, **kwargs):
         """Display AI response in the console."""
-        self.rich.print()
-        self.rich.print(Panel(
-            Markdown(text),
+        rich = self._get_rich()
+        rich.print()
+        rich.print(self._Panel(
+            self._Markdown(text),
             title="Onyx",
             border_style="green",
         ))
-        self.rich.print()
+        rich.print()
 
     async def read_input(self) -> str | None:
         """Read a single line of input."""
@@ -60,6 +72,8 @@ class ConsoleMessenger(Messenger):
 
     def print_status(self, items: list[tuple[str, str]]):
         """Print a status table."""
+        if not self.rich:
+            return
         self.rich.print()
         for label, value in items:
             self.rich.print(f"  [cyan]{label}:[/] {value}")
