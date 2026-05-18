@@ -564,6 +564,12 @@ class OnyxEngine:
             if now - last_sent < interval_min * 60:
                 continue
 
+            # Random chance: 40% to actually send (keeps it unpredictable)
+            import random
+            # Random chance: 40% to actually send (keeps it unpredictable)
+            if random.random() > 0.4:
+                continue
+
             # Pick a target (Telegram preferred)
             tg = self.messengers.get("telegram")
             if not tg or not tg.is_running:
@@ -576,7 +582,6 @@ class OnyxEngine:
                 "Been a while since we chatted. All good?",
                 "I'm here if you need me. Just say the word.",
             ]
-            import random
             msg = random.choice(prompts)
 
             last_sent = now
