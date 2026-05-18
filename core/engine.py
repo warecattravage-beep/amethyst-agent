@@ -143,25 +143,23 @@ class OnyxEngine:
         nc = C.NC
         b = C.BOLD
         dim = C.DIM
-        cy = C.CYAN
-        gr = C.GREEN
         m = self.config.get("active_model", "?").upper()
         msgs = len(self.messengers)
         skills = len(self.skills)
         print()
-        print(f"{v}        ◆ ◇ ◆ ◇ ◆ ◇ ◆ ◇ ◆ ◇ ◆ ◇ ◆ ◇ ◆ ◇ ◆{nc}")
+        print(f"{v}  ====== ====== ====== ====== ====== ======{nc}")
         print()
-        print(f"{v}        ███████╗ ██████╗ ███╗   ██╗██╗   ██╗██╗  ██╗{nc}")
-        print(f"{v}        ██╔════╝██╔═══██╗████╗  ██║╚██╗ ██╔╝╚██╗██╔╝{nc}")
-        print(f"{v}        █████╗  ██║   ██║██╔██╗ ██║ ╚████╔╝  ╚███╔╝{nc}")
-        print(f"{v}        ██╔══╝  ██║   ██║██║╚██╗██║  ╚██╔╝   ██╔██╗{nc}")
-        print(f"{v}        ██║     ╚██████╔╝██║ ╚████║   ██║   ██╔╝ ██╗{nc}")
-        print(f"{v}        ╚═╝      ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝{nc}")
+        print(f"{v}    ███████╗ ██████╗ ███╗   ██╗██╗   ██╗██╗  ██╗{nc}")
+        print(f"{v}    ██╔════╝██╔═══██╗████╗  ██║╚██╗ ██╔╝╚██╗██╔╝{nc}")
+        print(f"{v}    █████╗  ██║   ██║██╔██╗ ██║ ╚████╔╝  ╚███╔╝{nc}")
+        print(f"{v}    ██╔══╝  ██║   ██║██║╚██╗██║  ╚██╔╝   ██╔██╗{nc}")
+        print(f"{v}    ██║     ╚██████╔╝██║ ╚████║   ██║   ██╔╝ ██╗{nc}")
+        print(f"{v}    ╚═╝      ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝{nc}")
         print()
-        print(f"{b}           ✦ {name} Agent Gateway ✦{nc}")
-        print(f"{dim}     Messenger  |  Model: {m}  |  {skills} Skills{nc}")
+        print(f"{b}       ✦ {name} Agent Gateway ✦{nc}")
+        print(f"{dim}    Model: {m}  |  {skills} Skills  |  {msgs} Messengers{nc}")
         print()
-        print(f"{v}        ◇ ◆ ◇ ◆ ◇ ◆ ◇ ◆ ◇ ◆ ◇ ◆ ◇ ◆ ◇ ◆ ◇{nc}")
+        print(f"{v}  ====== ====== ====== ====== ====== ======{nc}")
         print()
 
     # ── Initialization ──
