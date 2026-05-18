@@ -159,6 +159,12 @@ fi
 
 chmod +x onyx.py
 
+# ── Create shortcut ~/onyx ──
+if [ ! -f "$HOME/onyx" ]; then
+    ln -sf "$SCRIPT_DIR/onyx.py" "$HOME/onyx"
+    echo -e "  ${GREEN}✓ Shortcut created: ~/onyx${NC}"
+fi
+
 # ── Done ──
 echo ""
 echo -e "${GREEN}  ═══════════════════════════════════════${NC}"
@@ -166,9 +172,10 @@ echo -e "${GREEN}   ✦ Onyx Agent Gateway — Installed! ✦${NC}"
 echo -e "${GREEN}  ═══════════════════════════════════════${NC}"
 echo ""
 echo -e "  ${BOLD}Quick Start:${NC}"
-echo -e "  ${CYAN}  ./onyx.py setup${NC}         First-time config"
-echo -e "  ${CYAN}  ./onyx.py start${NC}         Launch the agent"
-echo -e "  ${CYAN}  ./onyx.py dashboard${NC}    Open dashboard"
+echo -e "  ${CYAN}  ~/onyx setup${NC}           First-time config"
+echo -e "  ${CYAN}  ~/onyx start${NC}           Launch the agent"
+echo -e "  ${CYAN}  ~/onyx dashboard${NC}       Open dashboard"
+echo -e "  ${CYAN}  ~/onyx config${NC}          Edit config"
 echo ""
 echo -e "  ${BOLD}Gateway Features:${NC}"
 echo -e "  • Multi-messenger routing (Telegram / Discord / Console)"
