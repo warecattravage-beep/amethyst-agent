@@ -137,21 +137,42 @@ class OnyxEngine:
     # ── ASCII Banner ──
 
     def _print_banner(self):
-        """Print the gateway startup banner in violet."""
+        """Print the gateway startup banner in violet with gemstone ornaments."""
         name = self.config.get("agent_name", "Onyx")
         v = C.VIOLET
         nc = C.NC
         b = C.BOLD
         dim = C.DIM
+        cy = C.CYAN
+        gr = C.GREEN
         print()
-        print(f"{v}  ██████╗ ███╗   ██╗██╗   ██╗██╗  ██╗{nc}")
-        print(f"{v} ██╔═══██╗████╗  ██║╚██╗ ██╔╝╚██╗██╔╝{nc}")
-        print(f"{v} ██║   ██║██╔██╗ ██║ ╚████╔╝  ╚███╔╝{nc}")
-        print(f"{v} ██║   ██║██║╚██╗██║  ╚██╔╝   ██╔██╗{nc}")
-        print(f"{v} ╚██████╔╝██║ ╚████║   ██║   ██╔╝ ██╗{nc}")
-        print(f"{v}  ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝{nc}")
-        print(f"{b}  ✦ {name} Agent Gateway ✦{nc}")
-        print(f"{dim}  Skills: {len(self.skills)} | Models: {self.config.get('active_model', '?')} | Messengers: {len(self.messengers)}{nc}")
+        # Upper gemstone border
+        print(f"{v}        ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆{nc}")
+        print(f"{v}      ◇                              ◇{nc}")
+        print()
+        # Bigger Onyx ASCII
+        print(f"{v}         ███████╗ ██████╗ ███╗   ██╗██╗   ██╗██╗  ██╗{nc}")
+        print(f"{v}        ██╔════╝██╔═══██╗████╗  ██║╚██╗ ██╔╝╚██╗██╔╝{nc}")
+        print(f"{v}        █████╗  ██║   ██║██╔██╗ ██║ ╚████╔╝  ╚███╔╝{nc}")
+        print(f"{v}        ██╔══╝  ██║   ██║██║╚██╗██║  ╚██╔╝   ██╔██╗{nc}")
+        print(f"{v}        ██║     ╚██████╔╝██║ ╚████║   ██║   ██╔╝ ██╗{nc}")
+        print(f"{v}        ╚═╝      ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝{nc}")
+        print()
+        # Tagline
+        print(f"{b}              ✦ {name} Agent Gateway ✦{nc}")
+        print(f"{dim}         ◇  Multi-Messenger  ·  Multi-Model  ·  Plugin Skills  ◇{nc}")
+        print()
+        # Status line with colored indicators
+        model = self.config.get('active_model', '?')
+        msgr_count = len(self.messengers)
+        skill_count = len(self.skills)
+        print(f"{v}        ╔══════════════════════════════════════╗{nc}")
+        status = f"   {cy}🧠{nc} {model.upper():12s}  {gr}💬{nc} {msgr_count} msgr(s)  {cy}🔧{nc} {skill_count} skill(s)  "
+        print(f"{v}        ║{nc}{status}{v}║{nc}")
+        print(f"{v}        ╚══════════════════════════════════════╝{nc}")
+        # Lower gemstone border
+        print(f"{v}      ◇                              ◇{nc}")
+        print(f"{v}        ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆{nc}")
         print()
 
     # ── Initialization ──
