@@ -159,22 +159,28 @@ fi
 
 chmod +x onyx.py
 
-# ── Add to PATH so 'onyx' works from anywhere ──
-SHELL_RC="$HOME/.bashrc"
-if [ -f "$HOME/.zshrc" ]; then
-    SHELL_RC="$HOME/.zshrc"
-fi
-
-PATH_LINE="export PATH=\"\$PATH:$SCRIPT_DIR\""
-if ! grep -q "$SCRIPT_DIR" "$SHELL_RC" 2>/dev/null; then
-    echo "" >> "$SHELL_RC"
-    echo "# Onyx Agent" >> "$SHELL_RC"
-    echo "$PATH_LINE" >> "$SHELL_RC"
-    echo -e "  ${GREEN}✓ Added to PATH in $SHELL_RC${NC}"
-    echo -e "  ${CYAN}  Type: onyx start${NC}"
-    echo -e "  ${CYAN}  Or reload: source $SHELL_RC${NC}"
+# ── Make 'onyx' command available system-wide ──
+if [ -d "$PREFIX/bin" ] && [ -n "$PREFIX" ]; then
+    # Termux: copy to $PREFIX/bin (always in PATH)
+    cp "$SCRIPT_DIR/onyx.py" "$PREFIX/bin/onyx"
+    chmod +x "$PREFIX/bin/onyx"
+    echo -e "  ${GREEN}✓ Installed: onyx → $PREFIX/bin/onyx${NC}"
+elif [ -d "/usr/local/bin" ]; then
+    # Linux/macOS: symlink into /usr/local/bin
+    sudo ln -sf "$SCRIPT_DIR/onyx.py" "/usr/local/bin/onyx" 2>/dev/null || \
+        ln -sf "$SCRIPT_DIR/onyx.py" "$HOME/.local/bin/onyx" 2>/dev/null || true
+    echo -e "  ${GREEN}✓ Installed: onyx → /usr/local/bin/onyx${NC}"
 else
-    echo -e "  ${GREEN}✓ PATH already configured${NC}"
+    # Fallback: add to PATH in shell config
+    SHELL_RC="$HOME/.bashrc"
+    [ -f "$HOME/.zshrc" ] && SHELL_RC="$HOME/.zshrc"
+    PATH_LINE="export PATH=\"\$PATH:$SCRIPT_DIR\""
+    if ! grep -q "$SCRIPT_DIR" "$SHELL_RC" 2>/dev/null; then
+        echo "" >> "$SHELL_RC"
+        echo "# Onyx Agent" >> "$SHELL_RC"
+        echo "$PATH_LINE" >> "$SHELL_RC"
+        echo -e "  ${GREEN}✓ Added to PATH in $SHELL_RC${NC}"
+    fi
 fi
 
 # ── Done ──
