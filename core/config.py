@@ -48,7 +48,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "ollama": {
             "enabled": True,
             "host": "http://localhost:11434",
-            "model": "gemma2:9b",
+            "model": "onyx",
             "timeout": 60,
         },
         "openai": {
