@@ -278,14 +278,14 @@ class OnyxEngine:
             return
 
         # ── Autonomous multi-step loop ──
-        max_steps = 5
+        max_steps = 15
         final_response = ""
 
         for step in range(max_steps):
-            # Get model response (with 45s timeout)
+            # Get model response (with 120s timeout per step)
             try:
                 response = await asyncio.wait_for(
-                    self.model.chat(messages), timeout=45
+                    self.model.chat(messages), timeout=120
                 )
             except asyncio.TimeoutError:
                 log.warning("Autonomous step %d: timed out", step + 1)
