@@ -76,6 +76,8 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "terminal": {"enabled": True},
         "web_search": {"enabled": True},
         "web_fetch": {"enabled": True},
+        "file": {"enabled": True},
+        "code_review": {"enabled": True},
     },
 
     # ── System ──

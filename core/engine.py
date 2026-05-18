@@ -12,12 +12,14 @@ from pathlib import Path
 from typing import Any
 
 from core.config import Config
+from core.memory import Memory
 from core.messenger import Messenger, MessageHandler
 
 # ── Messenger imports ──
 from messengers.console import ConsoleMessenger
 from messengers.telegram_messenger import TelegramMessenger
 from messengers.discord_messenger import DiscordMessenger
+from messengers.signal_messenger import SignalMessenger
 
 # ── Model imports ──
 from models.ollama_model import OllamaModel
@@ -29,6 +31,8 @@ from skills.coding import CodingSkill
 from skills.terminal import TerminalSkill
 from skills.web_search import WebSearchSkill
 from skills.web_fetch import WebFetchSkill
+from skills.file_skill import FileSkill
+from skills.code_review import CodeReviewSkill
 
 log = logging.getLogger("onyx.engine")
 
@@ -36,6 +40,7 @@ MESSENGER_MAP = {
     "console": ConsoleMessenger,
     "telegram": TelegramMessenger,
     "discord": DiscordMessenger,
+    "signal": SignalMessenger,
 }
 
 MODEL_MAP = {
@@ -51,6 +56,8 @@ SKILL_MAP = {
     "terminal": TerminalSkill,
     "web_search": WebSearchSkill,
     "web_fetch": WebFetchSkill,
+    "file": FileSkill,
+    "code_review": CodeReviewSkill,
 }
 
 
@@ -66,6 +73,7 @@ class OnyxEngine:
         self._console: ConsoleMessenger | None = None
         self._message_queue: asyncio.Queue = asyncio.Queue()
         self._start_time = datetime.now(timezone.utc)
+        self._memory = Memory(config.resolve("data_dir") / "memory.json")
 
         # Setup logging
         self._setup_logging()
@@ -181,6 +189,9 @@ class OnyxEngine:
                 await self._send(chat_id, response, source)
             return
 
+        # Store user message in memory
+        self._memory.add(chat_id, "user", text)
+
         # Build conversation context
         messages = self._build_messages(text, meta)
 
@@ -191,6 +202,9 @@ class OnyxEngine:
 
         response = await self.model.chat(messages)
 
+        # Store assistant response in memory
+        self._memory.add(chat_id, "assistant", response)
+
         # Check if response contains skill invocations
         response = await self._process_skill_calls(response)
 
@@ -199,12 +213,16 @@ class OnyxEngine:
 
     def _build_messages(self, text: str, meta: dict) -> list[dict]:
         """Build the message list for the model."""
+        chat_id = meta.get("chat_id", "")
         skills_list = list(self.skills.keys())
         system = self.model.system_prompt(skills_list, self.config.get("agent_name", "Onyx"))
-        return [
-            {"role": "system", "content": system},
-            {"role": "user", "content": text},
-        ]
+        messages = [{"role": "system", "content": system}]
+        # Include recent conversation history
+        history = self._memory.get_context(chat_id, max_msgs=10)
+        messages.extend(history)
+        # Add current user message
+        messages.append({"role": "user", "content": text})
+        return messages
 
     async def _process_skill_calls(self, response: str) -> str:
         """Parse and execute skill calls from the model response.
@@ -258,6 +276,13 @@ class OnyxEngine:
             return self._format_models()
         elif cmd == "/skills":
             return self._format_skills()
+        elif cmd == "/clear":
+            self._memory.clear(chat_id)
+            self._memory._dirty = True
+            self._memory.save()
+            return "🧹 Memory cleared."
+        elif cmd == "/update":
+            return await self._handle_update()
         elif cmd == "/config":
             return "Use the config file: config.json"
         return None
@@ -271,6 +296,8 @@ class OnyxEngine:
             "/status — System status",
             "/models — Available AI models",
             "/skills — Enabled skills",
+            "/clear — Clear conversation memory",
+            "/update — Pull latest code and update dependencies",
             "/config — Configuration info",
             "",
             "**Skills available:**",
@@ -312,6 +339,47 @@ class OnyxEngine:
         for name, skill in self.skills.items():
             lines.append(f"  • **{name}** — {skill.description[:60]}")
         return "\n".join(lines)
+
+    async def _handle_update(self) -> str:
+        """Run git pull and update dependencies."""
+        import shutil
+
+        git_path = shutil.which("git")
+        if not git_path:
+            return "❌ Git is not available on this system."
+
+        try:
+            proc = await asyncio.create_subprocess_exec(
+                git_path, "pull",
+                cwd=Path(__file__).parent.parent,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
+            stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=60)
+            pull_output = stdout.decode().strip()
+            if stderr.decode().strip():
+                pull_output += "\n" + stderr.decode().strip()
+
+            # Update dependencies
+            pip_proc = await asyncio.create_subprocess_exec(
+                shutil.which("pip3") or "pip", "install", "-r", "requirements.txt",
+                cwd=Path(__file__).parent.parent,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+            )
+            pip_stdout, pip_stderr = await asyncio.wait_for(pip_proc.communicate(), timeout=120)
+            pip_output = pip_stdout.decode().strip()
+            if pip_stderr.decode().strip():
+                pip_output += "\n" + pip_stderr.decode().strip()
+
+            result = f"**Git pull:**\n```\n{pull_output}\n```"
+            if pip_output:
+                result += f"\n**Dependencies:**\n```\n{pip_output}\n```"
+            return result
+        except asyncio.TimeoutError:
+            return "❌ Update timed out."
+        except Exception as e:
+            return f"❌ Update failed: {e}"
 
     async def _send(self, target: str, text: str, source: str):
         """Send a response back through the appropriate messenger."""
@@ -397,6 +465,7 @@ class OnyxEngine:
     async def _shutdown(self):
         """Gracefully shut down all components."""
         log.info("✦ Onyx Agent shutting down...")
+        self._memory.save()
         for messenger in self.messengers.values():
             await messenger.stop()
         if self.model and hasattr(self.model, "stop"):
