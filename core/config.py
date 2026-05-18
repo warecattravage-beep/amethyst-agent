@@ -78,6 +78,8 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "web_fetch": {"enabled": True},
         "file": {"enabled": True},
         "code_review": {"enabled": True},
+        "project": {"enabled": True},
+        "notion": {"enabled": True, "api_key": ""},
     },
 
     # ── Proactive mode ──

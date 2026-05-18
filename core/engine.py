@@ -35,6 +35,7 @@ class C:
 
 from core.config import Config
 from core.memory import Memory
+from core.rag_memory import RAGMemory
 from core.messenger import Messenger, MessageHandler
 
 # ── Messenger imports ──
@@ -55,6 +56,8 @@ from skills.web_search import WebSearchSkill
 from skills.web_fetch import WebFetchSkill
 from skills.file_skill import FileSkill
 from skills.code_review import CodeReviewSkill
+from skills.project import ProjectSkill
+from skills.notion_skill import NotionSkill
 
 log = logging.getLogger("onyx.engine")
 
@@ -80,6 +83,8 @@ SKILL_MAP = {
     "web_fetch": WebFetchSkill,
     "file": FileSkill,
     "code_review": CodeReviewSkill,
+    "project": ProjectSkill,
+    "notion": NotionSkill,
 }
 
 
@@ -96,6 +101,7 @@ class OnyxEngine:
         self._message_queue: asyncio.Queue = asyncio.Queue()
         self._start_time = datetime.now(timezone.utc)
         self._memory = Memory(self.config.resolve("data_dir") / "memory.json")
+        self._rag_memory = RAGMemory(self.config.resolve("data_dir"))
         self._last_msg_time = time.time()
 
         # Setup logging
@@ -266,6 +272,7 @@ class OnyxEngine:
 
         # Store user message in memory
         self._memory.add(chat_id, "user", text)
+        self._rag_memory.add("user", text, chat_id)
 
         # Show typing indicator
         await self._send_action(chat_id, source)
@@ -277,35 +284,60 @@ class OnyxEngine:
             await self._send(chat_id, "Error: No AI model configured.", source)
             return
 
-        # ── Autonomous multi-step loop ──
+        # ── Autonomous multi-step loop with self-healing ──
         max_steps = 15
         final_response = ""
 
         for step in range(max_steps):
-            # Get model response (with 120s timeout per step)
-            try:
-                response = await asyncio.wait_for(
-                    self.model.chat(messages), timeout=120
-                )
-            except asyncio.TimeoutError:
-                log.warning("Autonomous step %d: timed out", step + 1)
-                final_response = "(Task timed out — try a simpler request?)"
-                break
+            errors = 0  # reset per step — 2 fresh retries each step
 
-            # Check for skill calls
-            skill_result = await self._process_skill_calls(response)
+            for retry in range(3):  # original call + up to 2 retries
+                # Get model response (with 120s timeout per step)
+                try:
+                    response = await asyncio.wait_for(
+                        self.model.chat(messages), timeout=120
+                    )
+                except asyncio.TimeoutError:
+                    log.warning("Autonomous step %d: timed out", step + 1)
+                    final_response = "(Task timed out — try a simpler request?)"
+                    break
 
-            if skill_result:
-                # Trim verbose results
+                # Check for skill calls
+                skill_result = await self._process_skill_calls(response)
+
+                if not skill_result:
+                    # No skill calls — final answer
+                    final_response = response
+                    break
+
+                # Check if the result contains an error
+                is_error = skill_result.startswith("Error:") or "Error:" in skill_result
+
+                if is_error:
+                    errors += 1
+                    if errors >= 2:
+                        # Give up after 2 failed retries
+                        messages.append({"role": "assistant", "content": response})
+                        messages.append({"role": "user", "content": f"Error: {skill_result}\n\nGiving up after {errors} retries."})
+                        final_response = f"(Failed after {errors} retries: {skill_result[:300]})"
+                        log.info("Step %d: gave up after %d retries", step + 1, errors)
+                        break
+                    else:
+                        # Feed error back and ask model to fix + retry
+                        messages.append({"role": "assistant", "content": response})
+                        messages.append({"role": "user", "content": f"Error: {skill_result}\n\nFix and retry."})
+                        log.info("Step %d: retry %d/2 after error", step + 1, errors)
+                        continue  # go to next retry attempt
+
+                # Success — feed result back for next reasoning round
                 if len(skill_result) > 1500:
                     skill_result = skill_result[:1500] + "\n... (truncated)"
-                # Feed result back for next reasoning round
                 messages.append({"role": "assistant", "content": response})
                 messages.append({"role": "user", "content": f"Result:\n{skill_result}\n\nProceed. If done, give final answer."})
-                log.info("Step %d: skill used", step + 1)
-            else:
-                # No skill calls — final answer
-                final_response = response
+                log.info("Step %d: skill used, no errors", step + 1)
+                break
+
+            if final_response:
                 break
 
         if not final_response:
@@ -313,6 +345,7 @@ class OnyxEngine:
 
         # Store final response in memory
         self._memory.add(chat_id, "assistant", final_response)
+        self._rag_memory.add("assistant", final_response, chat_id)
 
         # Send final response
         await self._send(chat_id, final_response, source)
@@ -323,7 +356,14 @@ class OnyxEngine:
         skills_list = list(self.skills.keys())
         vibe = self.config.get("agent_vibe", "Helpful, efficient AI assistant")
         system = self.model.system_prompt(skills_list, self.config.get("agent_name", "Onyx"))
+
         messages = [{"role": "system", "content": f"{system}\n\nPersonality: {vibe}"}]
+
+        # Include relevant RAG context from past conversations
+        rag_context = self._rag_memory.get_relevant_context(text, limit=3)
+        if rag_context:
+            messages.append({"role": "system", "content": rag_context})
+
         # Include recent conversation history
         history = self._memory.get_context(chat_id, max_msgs=10)
         messages.extend(history)
@@ -335,6 +375,8 @@ class OnyxEngine:
         """Parse and execute skill calls from the model response.
 
         Format: @skill_name(key=value, key2=value2)
+        Returns the response with skill calls replaced by their results,
+        or empty string if no skill calls were found.
         """
         import re
         pattern = r'@(\w+)\(([^)]*)\)'
@@ -348,25 +390,42 @@ class OnyxEngine:
                     kwargs[k.strip()] = v.strip().strip("\"'")
             return kwargs
 
-        def replace_skill(match):
+        # Check if there are any skill calls at all
+        if not re.search(pattern, response):
+            return ""  # No skill calls
+
+        # First pass: find all matches and replace with placeholders
+        matches = []
+        def placeholder(match):
+            matches.append(match)
+            return f"__SKILL_{len(matches)-1}__"
+
+        template = re.sub(pattern, placeholder, response)
+
+        # Second pass: execute all skills asynchronously
+        replacements = {}
+        for i, match in enumerate(matches):
             skill_name = match.group(1)
             kwargs_str = match.group(2)
 
             if skill_name not in self.skills:
-                return f"*Unknown skill: {skill_name}*"
-
-            kwargs = parse_kwargs(kwargs_str)
-            skill = self.skills[skill_name]
+                replacements[f"__SKILL_{i}__"] = f"*Unknown skill: {skill_name}*"
+                continue
 
             try:
-                loop = asyncio.get_event_loop()
-                future = asyncio.ensure_future(skill.run({"response": response}, **kwargs))
-                result = loop.run_until_complete(future)
-                return result or "(done)"
+                kwargs = parse_kwargs(kwargs_str)
+                skill = self.skills[skill_name]
+                result = await skill.run({"response": response}, **kwargs)
+                replacements[f"__SKILL_{i}__"] = result or "(done)"
             except Exception as e:
-                return f"*Skill error: {e}*"
+                log.warning("Skill %s error: %s", skill_name, e)
+                replacements[f"__SKILL_{i}__"] = f"Error: {skill_name} call failed: {e}"
 
-        result = re.sub(pattern, replace_skill, response)
+        # Third pass: substitute placeholders with actual results
+        result = template
+        for placeholder, value in replacements.items():
+            result = result.replace(placeholder, value)
+
         return result
 
     async def _handle_command(self, text: str, meta: dict) -> str | None:
@@ -392,6 +451,11 @@ class OnyxEngine:
             return await self._handle_update()
         elif cmd == "/config":
             return "Use the config file: config.json"
+        elif cmd == "/search":
+            query = text[len("/search"):].strip()
+            if not query:
+                return "Usage: /search <your query>"
+            return self._handle_search(query)
         return None
 
     def _format_help(self) -> str:
@@ -445,6 +509,25 @@ class OnyxEngine:
         lines = ["**Enabled Skills:**", ""]
         for name, skill in self.skills.items():
             lines.append(f"  • **{name}** — {skill.description[:60]}")
+        return "\n".join(lines)
+
+    def _handle_search(self, query: str) -> str:
+        """Search RAG memory for relevant past conversations."""
+        results = self._rag_memory.search(query, limit=5)
+        if not results:
+            return f"No results found for: _{query}_"
+
+        lines = [f"**Search: _{query}_**", f"Found {len(results)} result(s):", ""]
+        for i, r in enumerate(results, 1):
+            role = r["role"].capitalize()
+            content = r["content"]
+            if len(content) > 400:
+                content = content[:400] + "..."
+            score = r["score"]
+            lines.append(f"**{i}.** [{role}] (score: {score:.2f})")
+            lines.append(f"   _{content}_")
+            lines.append("")
+
         return "\n".join(lines)
 
     async def _handle_update(self) -> str:
@@ -684,6 +767,7 @@ class OnyxEngine:
         """Gracefully shut down all components."""
         log.info("✦ Onyx Agent shutting down...")
         self._memory.save()
+        self._rag_memory.save()
         for messenger in self.messengers.values():
             await messenger.stop()
         if self.model and hasattr(self.model, "stop"):
