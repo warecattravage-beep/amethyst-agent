@@ -13,7 +13,7 @@ log = logging.getLogger("onyx.config")
 
 DEFAULT_CONFIG: dict[str, Any] = {
     # ── Agent identity ──
-    "agent_name": "Onyx",
+    "agent_name": "Fonyx",
     "agent_vibe": "Helpful, efficient AI assistant with coding skills.",
 
     # ── Active messenger ──

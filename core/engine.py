@@ -154,7 +154,7 @@ class OnyxEngine:
         print(f"{v}    ██║     ╚██████╔╝██║ ╚████║   ██║   ██╔╝ ██╗{nc}")
         print(f"{v}    ╚═╝      ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝{nc}")
         print()
-        print(f"{b}       ✦ {name} Agent Gateway ✦{nc}")
+        print(f"{b}       ✦ Fonyx Agent Gateway ✦{nc}")
         print(f"{dim}    Model: {m}  |  {skills} Skills  |  {msgs} Messengers{nc}")
         print()
 
