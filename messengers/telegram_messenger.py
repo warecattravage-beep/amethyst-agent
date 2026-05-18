@@ -25,7 +25,7 @@ class TelegramMessenger(Messenger):
 
     async def _api(self, method: str, **kwargs) -> dict | None:
         """Call Telegram API."""
-        if not self._http or not self._running:
+        if not self._http:
             return None
         try:
             r = await self._http.post(
