@@ -137,7 +137,7 @@ class OnyxEngine:
     # ── ASCII Banner ──
 
     def _print_banner(self):
-        """Print the gateway startup banner in violet with gemstone ornaments."""
+        """Print the gateway startup banner in violet."""
         name = self.config.get("agent_name", "Onyx")
         v = C.VIOLET
         nc = C.NC
@@ -145,34 +145,23 @@ class OnyxEngine:
         dim = C.DIM
         cy = C.CYAN
         gr = C.GREEN
+        m = self.config.get("active_model", "?").upper()
+        msgs = len(self.messengers)
+        skills = len(self.skills)
         print()
-        # Upper gemstone border
-        print(f"{v}        ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆{nc}")
-        print(f"{v}      ◇                              ◇{nc}")
+        print(f"{v}        ◆ ◇ ◆ ◇ ◆ ◇ ◆ ◇ ◆ ◇ ◆ ◇ ◆ ◇ ◆ ◇ ◆{nc}")
         print()
-        # Bigger Onyx ASCII
-        print(f"{v}         ███████╗ ██████╗ ███╗   ██╗██╗   ██╗██╗  ██╗{nc}")
+        print(f"{v}        ███████╗ ██████╗ ███╗   ██╗██╗   ██╗██╗  ██╗{nc}")
         print(f"{v}        ██╔════╝██╔═══██╗████╗  ██║╚██╗ ██╔╝╚██╗██╔╝{nc}")
         print(f"{v}        █████╗  ██║   ██║██╔██╗ ██║ ╚████╔╝  ╚███╔╝{nc}")
         print(f"{v}        ██╔══╝  ██║   ██║██║╚██╗██║  ╚██╔╝   ██╔██╗{nc}")
         print(f"{v}        ██║     ╚██████╔╝██║ ╚████║   ██║   ██╔╝ ██╗{nc}")
         print(f"{v}        ╚═╝      ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝{nc}")
         print()
-        # Tagline
-        print(f"{b}              ✦ {name} Agent Gateway ✦{nc}")
-        print(f"{dim}         ◇  Multi-Messenger  ·  Multi-Model  ·  Plugin Skills  ◇{nc}")
+        print(f"{b}           ✦ {name} Agent Gateway ✦{nc}")
+        print(f"{dim}     Messenger  |  Model: {m}  |  {skills} Skills{nc}")
         print()
-        # Status line with colored indicators
-        model = self.config.get('active_model', '?')
-        msgr_count = len(self.messengers)
-        skill_count = len(self.skills)
-        print(f"{v}        ╔══════════════════════════════════════╗{nc}")
-        status = f"   {cy}🧠{nc} {model.upper():12s}  {gr}💬{nc} {msgr_count} msgr(s)  {cy}🔧{nc} {skill_count} skill(s)  "
-        print(f"{v}        ║{nc}{status}{v}║{nc}")
-        print(f"{v}        ╚══════════════════════════════════════╝{nc}")
-        # Lower gemstone border
-        print(f"{v}      ◇                              ◇{nc}")
-        print(f"{v}        ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆ ◆{nc}")
+        print(f"{v}        ◇ ◆ ◇ ◆ ◇ ◆ ◇ ◆ ◇ ◆ ◇ ◆ ◇ ◆ ◇ ◆ ◇{nc}")
         print()
 
     # ── Initialization ──
