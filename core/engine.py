@@ -536,7 +536,7 @@ class OnyxEngine:
             await asyncio.sleep(1)
 
     async def _proactive_loop(self):
-        """Send proactive messages when idle."""
+        """Send proactive messages when idle — random timing, guaranteed min 1/30min."""
         pro = self.config.get("proactive", {})
         if not pro.get("enabled", True):
             return
@@ -544,10 +544,12 @@ class OnyxEngine:
         interval_min = pro.get("interval_minutes", 30)
         quiet_start = pro.get("quiet_hours_start", 23)
         quiet_end = pro.get("quiet_hours_end", 8)
+        force_after = interval_min * 60  # force send after this many seconds
         last_sent = 0
+        import random
 
         while self._running:
-            await asyncio.sleep(60)  # check every minute
+            await asyncio.sleep(60)
             now = time.time()
 
             # Skip if not idle enough
@@ -560,22 +562,22 @@ class OnyxEngine:
             if quiet_end < hour < quiet_start:
                 continue
 
-            # Skip if sent recently
-            if now - last_sent < interval_min * 60:
+            # Skip if sent too recently
+            elapsed = now - last_sent
+            if elapsed < force_after:
                 continue
 
-            # Random chance: 40% to actually send (keeps it unpredictable)
-            import random
-            # Random chance: 40% to actually send (keeps it unpredictable)
-            if random.random() > 0.4:
+            # Random: sometimes send early, but FORCE after interval_min
+            # If elapsed > interval_min * 1.2: force send (guaranteed minimum)
+            # Otherwise: 30% random chance per check
+            if elapsed < force_after * 1.2 and random.random() > 0.3:
                 continue
 
-            # Pick a target (Telegram preferred)
+            # Send proactive message
             tg = self.messengers.get("telegram")
             if not tg or not tg.is_running:
                 continue
 
-            # Craft a gentle proactive message
             prompts = [
                 "Hey, everything running smoothly. Anything on your mind?",
                 "System's quiet. Just checking in — need anything?",
@@ -583,9 +585,8 @@ class OnyxEngine:
                 "I'm here if you need me. Just say the word.",
             ]
             msg = random.choice(prompts)
-
             last_sent = now
-            log.info("Proactive ping: %s", msg)
+            log.info("Proactive: %s", msg)
             for chat_id in ["8601374613"]:
                 await tg.send(chat_id, msg)
 
