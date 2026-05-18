@@ -85,7 +85,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "enabled": True,
         "idle_minutes": 10,       # send after this many mins of silence
         "interval_minutes": 30,    # don't send again until this passes
-        "max_per_day": 15,         # max proactive messages per day
+        "max_per_day": 5,          # max proactive messages per day
         "quiet_hours_start": 23,   # 11 PM
         "quiet_hours_end": 8,      # 8 AM
     },
