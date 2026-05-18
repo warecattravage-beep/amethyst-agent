@@ -56,6 +56,27 @@ def run_setup(config) -> None:
     if inp:
         config.set("models.ollama.model", inp)
 
+    # Persona
+    print("\n" + "=" * 40)
+    print("\nPersona — How should Onyx behave?")
+    print("  Describe its personality in a few words.")
+    print("  Examples:")
+    print("    'Friendly coding buddy who explains everything simply'")
+    print("    'Efficient sysadmin — short answers, no fluff'")
+    print("    'Creative storyteller with a dark sense of humor'")
+    default_vibe = config.get("agent_vibe", "")
+    inp = input(f"\nPersona [{default_vibe or 'Helpful, efficient AI assistant'}]: ").strip()
+    if inp:
+        config.set("agent_vibe", inp)
+    elif not default_vibe:
+        config.set("agent_vibe", "Helpful, efficient AI assistant")
+
+    # Proactive mode
+    print("\n" + "=" * 40)
+    pro = config.get("proactive", {}).get("enabled", True)
+    inp = input(f"\nProactive mode — let Onyx message you unprompted? [Y/n]: ").strip().lower()
+    config.set("proactive.enabled", inp not in ("n", "no"))
+
     print(f"\n{'='*40}")
     print(f"✅ Setup complete!")
     print(f"   Agent: {config.get('agent_name')}")

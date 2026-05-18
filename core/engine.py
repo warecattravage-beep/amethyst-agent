@@ -293,8 +293,9 @@ class OnyxEngine:
         """Build the message list for the model."""
         chat_id = meta.get("chat_id", "")
         skills_list = list(self.skills.keys())
+        vibe = self.config.get("agent_vibe", "Helpful, efficient AI assistant")
         system = self.model.system_prompt(skills_list, self.config.get("agent_name", "Onyx"))
-        messages = [{"role": "system", "content": system}]
+        messages = [{"role": "system", "content": f"{system}\n\nPersonality: {vibe}"}]
         # Include recent conversation history
         history = self._memory.get_context(chat_id, max_msgs=10)
         messages.extend(history)
