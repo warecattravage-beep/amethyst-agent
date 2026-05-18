@@ -1,8 +1,10 @@
 """
-✦ Discord Messenger — Bot interface.
+✦ Discord Messenger — Bot with gateway (real-time messages).
+Uses discord.py client for both sending and receiving.
 """
 from __future__ import annotations
 
+import asyncio
 import logging
 from typing import Any
 
@@ -12,57 +14,73 @@ log = logging.getLogger("onyx.discord")
 
 
 class DiscordMessenger(Messenger):
-    """Discord bot messenger using HTTP API (no gateway)."""
+    """Discord bot with full gateway support via discord.py."""
 
     def __init__(self, config: dict):
         super().__init__("discord", config)
         self.token = config.get("token", "")
-        self._base = "https://discord.com/api/v10"
-        self._http: httpx.AsyncClient | None = None
-
-    def _headers(self):
-        return {
-            "Authorization": f"Bot {self.token}",
-            "Content-Type": "application/json",
-        }
+        self._client = None
+        self._ready = asyncio.Event()
 
     async def start(self):
-        import httpx
         if not self.token:
             log.warning("Discord: no token configured")
             return
-        self._http = httpx.AsyncClient()
-        # Verify bot token
-        r = await self._http.get(f"{self._base}/users/@me", headers=self._headers())
-        if r.status_code == 200:
-            data = r.json()
-            log.info("Discord bot: @%s", data.get("username", "?"))
-            self._running = True
-        else:
-            log.warning("Discord: invalid token (HTTP %d)", r.status_code)
+        try:
+            import discord
+            intents = discord.Intents.default()
+            intents.message_content = True
+
+            class OnyxBot(discord.Client):
+                def __init__(self, messenger):
+                    super().__init__(intents=intents)
+                    self.messenger = messenger
+
+                async def on_ready(self):
+                    log.info("Discord bot: @%s (%d guilds)",
+                             self.user.name, len(self.guilds))
+                    self.messenger._ready.set()
+                    self.messenger._running = True
+
+                async def on_message(self, msg):
+                    if msg.author == self.user:
+                        return
+                    text = msg.content.strip()
+                    if not text:
+                        return
+                    await self.messenger._handle(text, {
+                        "source": "discord",
+                        "chat_id": str(msg.channel.id),
+                        "channel": str(msg.channel.name),
+                        "sender": str(msg.author),
+                        "author_id": str(msg.author.id),
+                        "guild": str(msg.guild.name) if msg.guild else "DM",
+                        "message_id": msg.id,
+                    })
+
+            self._client = OnyxBot(self)
+            asyncio.create_task(self._client.start(self.token))
+            # Wait for ready
+            try:
+                await asyncio.wait_for(self._ready.wait(), timeout=15)
+            except asyncio.TimeoutError:
+                log.warning("Discord: connection timed out")
+
+        except ImportError:
+            log.warning("Discord: discord.py not installed. pip install discord.py")
 
     async def stop(self):
         self._running = False
-        if self._http:
-            await self._http.aclose()
+        if self._client:
+            await self._client.close()
 
     async def send(self, target: str, text: str, **kwargs):
-        """Send message to a Discord channel (target = channel_id)."""
-        if not self._http:
+        """Send message to a Discord channel."""
+        if not self._client or not self._client.is_ready():
             return
         try:
-            await self._http.post(
-                f"{self._base}/channels/{target}/messages",
-                headers=self._headers(),
-                json={"content": text},
-                timeout=15,
-            )
+            channel = self._client.get_channel(int(target))
+            if channel:
+                await channel.send(text[:2000])
         except Exception as e:
             log.error("Discord send failed: %s", e)
-
-    async def poll(self):
-        """Poll for new messages via getChannelMessages."""
-        # Discord HTTP API doesn't support polling easily without gateway.
-        # For v1, this messenger requires webhook or gateway setup.
-        # Placeholder for future implementation.
-        pass
