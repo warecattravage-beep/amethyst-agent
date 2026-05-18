@@ -247,7 +247,7 @@ class OnyxEngine:
         await self._message_queue.put((text, meta))
 
     async def _process_message(self, text: str, meta: dict[str, Any]):
-        """Process a single message through the model and skills."""
+        """Process a message with autonomous multi-step reasoning loop."""
         source = meta.get("source", "unknown")
         chat_id = meta.get("chat_id", "")
         sender = meta.get("sender", "?")
@@ -267,27 +267,45 @@ class OnyxEngine:
         # Store user message in memory
         self._memory.add(chat_id, "user", text)
 
-        # Show typing indicator (Telegram) before model call
+        # Show typing indicator
         await self._send_action(chat_id, source)
 
-        # Build conversation context
+        # Build initial context
         messages = self._build_messages(text, meta)
 
-        # Get model response
         if not self.model:
             await self._send(chat_id, "Error: No AI model configured.", source)
             return
 
-        response = await self.model.chat(messages)
+        # ── Autonomous multi-step loop ──
+        max_steps = 8
+        final_response = ""
 
-        # Store assistant response in memory
-        self._memory.add(chat_id, "assistant", response)
+        for step in range(max_steps):
+            # Get model response
+            response = await self.model.chat(messages)
 
-        # Check if response contains skill invocations
-        response = await self._process_skill_calls(response)
+            # Check for skill calls
+            skill_result = await self._process_skill_calls(response)
 
-        # Send response
-        await self._send(chat_id, response, source)
+            if skill_result:
+                # Skill was executed — feed result back for next reasoning round
+                messages.append({"role": "assistant", "content": response})
+                messages.append({"role": "user", "content": f"Tool result:\n{skill_result}\n\nContinue working toward the goal. If done, summarize the final result."})
+                log.info("Autonomous step %d: skill executed", step + 1)
+            else:
+                # No skill calls — this is the final answer
+                final_response = response
+                break
+
+        if not final_response:
+            final_response = f"(Completed after {max_steps} reasoning steps)"
+
+        # Store final response in memory
+        self._memory.add(chat_id, "assistant", final_response)
+
+        # Send final response
+        await self._send(chat_id, final_response, source)
 
     def _build_messages(self, text: str, meta: dict) -> list[dict]:
         """Build the message list for the model."""
