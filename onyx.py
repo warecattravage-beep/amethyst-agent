@@ -18,7 +18,21 @@ import os
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent
+# ── Find project root ──
+# The script may be symlinked or copied (e.g. $PREFIX/bin/onyx).
+# Search for the actual project directory containing core/
+_script = Path(__file__).resolve()
+ROOT = _script.parent
+# If we're in a system bin dir, look for the project in home
+if not (ROOT / "core").is_dir():
+    for candidate in [
+        Path.home() / "onyx-agent-v3",
+        Path.home() / "onyx",
+        _script.parent.parent / "onyx-agent-v3",
+    ]:
+        if (candidate / "core").is_dir():
+            ROOT = candidate
+            break
 sys.path.insert(0, str(ROOT))
 
 log = logging.getLogger("onyx")
