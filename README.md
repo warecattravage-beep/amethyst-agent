@@ -26,7 +26,7 @@ Speak to your agent through **Telegram**, **Discord**, **console terminal**, or 
 ### 🧠 Multi-Model
 Swap between **Ollama** (local, free, private) and **OpenAI** (GPT-4o) backends. Switch anytime with `/models` or the dashboard.
 
-### 🔧 Plugin Skills
+### 🔧 Plugin Skills (11 total)
 | Skill | What it does |
 |---|---|
 | 💬 `chat` | General conversation (always on) |
@@ -36,12 +36,16 @@ Swap between **Ollama** (local, free, private) and **OpenAI** (GPT-4o) backends.
 | 📄 `web_fetch` | Fetch any URL and extract text |
 | 📁 `file` | Read and write files |
 | 🔍 `code_review` | Review code from files |
+| 📂 `project` | Create multi-file projects under ~/Projects/ |
+| 📝 `notion` | Query/create Notion pages and databases |
+| 🔍 `search` | Search past conversations (RAG memory) |
+| 🔄 `self_heal` | Auto-retry failed skills with fixes |
 
 ### 💬 Proactive Conversation
 The agent can message you unprompted after 10 minutes of idle time — random check-ins, max once per 30 minutes. Configurable or disableable.
 
-### 🧠 Conversation Memory
-Remembers past messages per chat (up to 10 exchanges). Ask a question, follow up with *"explain more"* — it remembers context.
+### 🧠 Conversation Memory + RAG
+Remembers past messages per chat (up to 10 exchanges). Ask a question, follow up with *"explain more"* — it remembers context. **RAG memory** lets you `/search` across all past conversations using keyword matching.
 
 ### 🖥️ Dashboards
 - **Desktop (Linux/Windows):** Kivy native GUI
@@ -84,7 +88,7 @@ python onyx.py start
 
 | Command | What it does |
 |---|---|
-| `onyx setup` | 🎯 First-time config (name, model, Telegram, persona) |
+| `onyx setup` | 🎯 Step-by-step onboarding wizard (identity, model, Telegram, proactive, Notion) |
 | `onyx start` | ▶️ Launch the agent gateway |
 | `onyx dashboard` | 🖥️ Open GUI or web dashboard |
 | `onyx dashboard --web` | 🌐 Force web dashboard |
@@ -260,21 +264,22 @@ onyx start
 
 - [x] ✅ Console, Telegram, Discord messengers
 - [x] ✅ Ollama + OpenAI models
-- [x] ✅ Plugin skills (coding, terminal, web, file, review)
-- [x] ✅ Conversation memory (multi-turn context)
+- [x] ✅ 11 plugin skills
+- [x] ✅ Conversation memory + RAG search
 - [x] ✅ Configurable persona
-- [x] ✅ Proactive mode (random check-ins)
-- [x] ✅ File read/write skill
-- [x] ✅ Auto-update (`/update` command)
+- [x] ✅ Proactive mode (random check-ins, max 5/day)
+- [x] ✅ Autonomous mode (15-step reasoning)
+- [x] ✅ Self-healing (auto-retry failed skills)
+- [x] ✅ Project mode (multi-file projects)
+- [x] ✅ Notion integration
+- [x] ✅ Auto-update (checks GitHub every 30 min)
 - [x] ✅ Colorful logs + violet ASCII banner
 - [x] ✅ Kivy GUI + Web dashboard
 - [x] ✅ Typing indicator (Telegram)
+- [x] ✅ Step-by-step onboarding wizard
 - [x] ✅ Cross-platform (Linux, Windows, Termux)
-- [x] ✅ `onyx` command system-wide
-- [ ] 🔜 Signal messenger (full support)
-- [ ] 🔜 Claude model
 - [ ] 🔜 Docker support
-- [ ] 🔜 Plugin auto-loader (drop skills in a folder)
+- [ ] 🔜 Plugin auto-loader
 
 ---
 
