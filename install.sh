@@ -159,10 +159,22 @@ fi
 
 chmod +x onyx.py
 
-# ── Create shortcut ~/onyx ──
-if [ ! -f "$HOME/onyx" ]; then
-    ln -sf "$SCRIPT_DIR/onyx.py" "$HOME/onyx"
-    echo -e "  ${GREEN}✓ Shortcut created: ~/onyx${NC}"
+# ── Add to PATH so 'onyx' works from anywhere ──
+SHELL_RC="$HOME/.bashrc"
+if [ -f "$HOME/.zshrc" ]; then
+    SHELL_RC="$HOME/.zshrc"
+fi
+
+PATH_LINE="export PATH=\"\$PATH:$SCRIPT_DIR\""
+if ! grep -q "$SCRIPT_DIR" "$SHELL_RC" 2>/dev/null; then
+    echo "" >> "$SHELL_RC"
+    echo "# Onyx Agent" >> "$SHELL_RC"
+    echo "$PATH_LINE" >> "$SHELL_RC"
+    echo -e "  ${GREEN}✓ Added to PATH in $SHELL_RC${NC}"
+    echo -e "  ${CYAN}  Type: onyx start${NC}"
+    echo -e "  ${CYAN}  Or reload: source $SHELL_RC${NC}"
+else
+    echo -e "  ${GREEN}✓ PATH already configured${NC}"
 fi
 
 # ── Done ──
@@ -172,10 +184,11 @@ echo -e "${GREEN}   ✦ Onyx Agent Gateway — Installed! ✦${NC}"
 echo -e "${GREEN}  ═══════════════════════════════════════${NC}"
 echo ""
 echo -e "  ${BOLD}Quick Start:${NC}"
-echo -e "  ${CYAN}  ~/onyx setup${NC}           First-time config"
-echo -e "  ${CYAN}  ~/onyx start${NC}           Launch the agent"
-echo -e "  ${CYAN}  ~/onyx dashboard${NC}       Open dashboard"
-echo -e "  ${CYAN}  ~/onyx config${NC}          Edit config"
+echo -e "  ${CYAN}  source $SHELL_RC${NC}           Reload shell config"
+echo -e "  ${CYAN}  onyx setup${NC}                 First-time config"
+echo -e "  ${CYAN}  onyx start${NC}                 Launch the agent"
+echo -e "  ${CYAN}  onyx dashboard${NC}             Open dashboard"
+echo -e "  ${CYAN}  onyx config${NC}                Edit config"
 echo ""
 echo -e "  ${BOLD}Gateway Features:${NC}"
 echo -e "  • Multi-messenger routing (Telegram / Discord / Console)"
