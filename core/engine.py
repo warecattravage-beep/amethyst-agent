@@ -489,12 +489,12 @@ class OnyxEngine:
         self._running = True
         self._start_time = datetime.now(timezone.utc)
 
-        self._print_banner()
         log.info("✦ Onyx Agent starting...")
         await self.init_skills()
         await self.init_models()
         await self.init_messengers()
 
+        self._print_banner()
         log.info("✦ Onyx Agent ready — %d skills, %d messengers",
                  len(self.skills), len(self.messengers))
 
