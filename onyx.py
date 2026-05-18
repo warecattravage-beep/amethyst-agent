@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-✦ Onyx Agent — Standalone cross-platform agent gateway.
+* Onyx Agent — Standalone cross-platform agent gateway.
 
 Usage:
     python onyx.py start       Launch the agent
@@ -116,7 +116,7 @@ def cmd_help():
 
 def main():
     parser = argparse.ArgumentParser(
-        description="✦ Onyx Agent — Standalone AI agent gateway",
+        description="* Onyx Agent — Standalone AI agent gateway",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

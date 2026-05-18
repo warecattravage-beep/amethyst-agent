@@ -1,5 +1,5 @@
 """
-✦ Onyx Engine — Core message router and lifecycle manager.
+* Onyx Engine — Core message router and lifecycle manager.
 """
 from __future__ import annotations
 
@@ -180,7 +180,7 @@ class OnyxEngine:
         print(f"{v}   ╚██████╔╝ ██║ ╚███║    ██║    ██╔╝ ██╗{nc}")
         print(f"{v}    ╚═════╝  ╚═╝  ╚══╝    ╚═╝    ╚═╝  ╚═╝{nc}")
         print()
-        print(f"{b}       ✦ {name} Agent Gateway ✦{nc}")
+        print(f"{b}       * {name} Agent Gateway *{nc}")
         print()
 
     def _print_status_line(self):
@@ -460,7 +460,7 @@ class OnyxEngine:
 
     def _format_help(self) -> str:
         lines = [
-            f"**✦ {self.config.get('agent_name', 'Onyx')} Agent**",
+            f"*** {self.config.get('agent_name', 'Onyx')} Agent**",
             "",
             "**Commands:**",
             "/help — This message",
@@ -489,7 +489,7 @@ class OnyxEngine:
         mins = int((uptime.total_seconds() % 3600) // 60)
         model_name = self.config.get("active_model", "none")
         return (
-            f"**✦ {self.config.get('agent_name', 'Onyx')} Status**\n\n"
+            f"*** {self.config.get('agent_name', 'Onyx')} Status**\n\n"
             f"⏱ Uptime: {hours}h {mins}m\n"
             f"🧠 Model: {model_name}\n"
             f"💬 Messengers: {', '.join(self.messengers.keys()) or 'none'}\n"
@@ -601,12 +601,12 @@ class OnyxEngine:
         self._start_time = datetime.now(timezone.utc)
 
         self._print_banner()
-        log.info("✦ Loading...")
+        log.info("* Loading...")
         await self.init_skills()
         await self.init_models()
         await self.init_messengers()
 
-        log.info("✦ Ready — %d skills, %d messengers",
+        log.info("* Ready — %d skills, %d messengers",
                  len(self.skills), len(self.messengers))
         self._print_status_line()
 
@@ -765,11 +765,11 @@ class OnyxEngine:
 
     async def _shutdown(self):
         """Gracefully shut down all components."""
-        log.info("✦ Onyx Agent shutting down...")
+        log.info("* Onyx Agent shutting down...")
         self._memory.save()
         self._rag_memory.save()
         for messenger in self.messengers.values():
             await messenger.stop()
         if self.model and hasattr(self.model, "stop"):
             await self.model.stop()
-        log.info("✦ Onyx Agent stopped.")
+        log.info("* Onyx Agent stopped.")
