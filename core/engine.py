@@ -94,7 +94,7 @@ class OnyxEngine:
         self._console: ConsoleMessenger | None = None
         self._message_queue: asyncio.Queue = asyncio.Queue()
         self._start_time = datetime.now(timezone.utc)
-        self._memory = Memory(config.resolve("data_dir") / "memory.json")
+        self._memory = Memory(self.config.resolve("data_dir") / "memory.json")
 
         # Setup logging
         self._setup_logging()
