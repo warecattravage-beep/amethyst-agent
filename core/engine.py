@@ -163,15 +163,9 @@ class OnyxEngine:
     # ── ASCII Banner ──
 
     def _print_banner(self):
-        """Print the gateway startup banner in violet."""
+        """Print the gateway ASCII art banner (no counts — just the art)."""
         name = self.config.get("agent_name", "Onyx")
-        v = C.VIOLET
-        nc = C.NC
-        b = C.BOLD
-        dim = C.DIM
-        m = self.config.get("active_model", "?").upper()
-        msgs = len(self.messengers)
-        skills = len(self.skills)
+        v = C.VIOLET; nc = C.NC; b = C.BOLD
         print()
         print(f"{v}    ██████╗  ███╗  ██╗ ██╗  ██╗ ██╗  ██╗{nc}")
         print(f"{v}   ██╔═══██╗ ████╗ ██║ ╚██╗ ██╔╝ ╚██╗██╔╝{nc}")
@@ -180,8 +174,14 @@ class OnyxEngine:
         print(f"{v}   ╚██████╔╝ ██║ ╚███║    ██║    ██╔╝ ██╗{nc}")
         print(f"{v}    ╚═════╝  ╚═╝  ╚══╝    ╚═╝    ╚═╝  ╚═╝{nc}")
         print()
-        print(f"{b}       ✦ Onyx Agent Gateway ✦{nc}")
-        print(f"{dim}    Model: {m}  |  {skills} Skills  |  {msgs} Messengers{nc}")
+        print(f"{b}       ✦ {name} Agent Gateway ✦{nc}")
+        print()
+
+    def _print_status_line(self):
+        """Print a compact status line after initialization."""
+        m = self.config.get("active_model", "?").upper()
+        nv = C.VIOLET; nc = C.NC
+        print(f"{nv}  Model: {m}  |  {len(self.skills)} Skills  |  {len(self.messengers)} Messengers{nc}")
         print()
 
     # ── Initialization ──
@@ -489,14 +489,15 @@ class OnyxEngine:
         self._running = True
         self._start_time = datetime.now(timezone.utc)
 
-        log.info("✦ Onyx Agent starting...")
+        self._print_banner()
+        log.info("✦ Loading...")
         await self.init_skills()
         await self.init_models()
         await self.init_messengers()
 
-        self._print_banner()
-        log.info("✦ Onyx Agent ready — %d skills, %d messengers",
+        log.info("✦ Ready — %d skills, %d messengers",
                  len(self.skills), len(self.messengers))
+        self._print_status_line()
 
         # Console input loop
         if self._console:
