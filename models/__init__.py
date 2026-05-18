@@ -1,1 +1,1 @@
-"""✦ Onyx Agent — Models module."""
+"""✦ Onyx Agent - Models module."""

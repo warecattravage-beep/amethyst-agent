@@ -1,7 +1,7 @@
 """
-✦ Onyx Dashboard — Native GUI App
+✦ Onyx Dashboard - Native GUI App
 Cross-platform: Windows / Linux / Android (Termux)
-Built with Kivy — pure Python, no KV language.
+Built with Kivy - pure Python, no KV language.
 """
 from __future__ import annotations
 
@@ -81,7 +81,7 @@ class StatusTab(BoxLayout):
         self.add_widget(Label(text='✦ Status Overview', bold=True,
                               size_hint_y=None, height=dp(30), color=BLUE))
         items = [
-            ('Active Model', config.get('active_model', '—')),
+            ('Active Model', config.get('active_model', '-')),
             ('Messengers', ', '.join(config.active_messengers) or 'none'),
             ('Skills', f'{len(config.enabled_skills)} active'),
             ('Config', str(Path(config.path).resolve())),
@@ -254,7 +254,7 @@ class LogTab(BoxLayout):
             lines = log_file.read_text().split('\n')
             self.lbl.text = '\n'.join(lines[-40:])
         else:
-            self.lbl.text = '(no log file yet — run the agent first)'
+            self.lbl.text = '(no log file yet - run the agent first)'
 
 
 # ── App ──

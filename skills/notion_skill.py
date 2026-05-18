@@ -1,5 +1,5 @@
 """
-✦ Notion Skill — Integrate with Notion API.
+✦ Notion Skill - Integrate with Notion API.
 Uses httpx (lazy import) for async HTTP requests.
 """
 from __future__ import annotations
@@ -112,7 +112,7 @@ class NotionSkill(Skill):
             if title_data:
                 title = title_data[0].get("plain_text", "Untitled")
             db_id = db.get("id", "?")
-            lines.append(f"  • **{title}** — `{db_id}`")
+            lines.append(f"  • **{title}** - `{db_id}`")
 
         return "\n".join(lines)
 
@@ -147,7 +147,7 @@ class NotionSkill(Skill):
                         title_str = texts[0].get("plain_text", prop_name)
                         break
             page_id = page.get("id", "?")[:8]
-            lines.append(f"  {i}. **{title_str}** — `{page_id}`")
+            lines.append(f"  {i}. **{title_str}** - `{page_id}`")
 
         if len(results) > 20:
             lines.append(f"  ... and {len(results) - 20} more")
@@ -206,7 +206,7 @@ class NotionSkill(Skill):
                         if titles:
                             title = titles[0].get("plain_text", prop_name)
                             break
-            lines.append(f"  {i}. **{title}** ({obj_type}) — `{item_id}`")
+            lines.append(f"  {i}. **{title}** ({obj_type}) - `{item_id}`")
 
         if len(results) > 10:
             lines.append(f"  ... and {len(results) - 10} more")

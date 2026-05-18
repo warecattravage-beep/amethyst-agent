@@ -1,4 +1,4 @@
-"""Onyx Agent — configuration"""
+"""Onyx Agent - configuration"""
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -23,7 +23,7 @@ class Config:
     plugins_dir: str = "plugins"
     tools_dir: str = "tools"
 
-    # Thinking mode — Gemma 4 supports configurable thinking
+    # Thinking mode - Gemma 4 supports configurable thinking
     thinking: bool = True
     # If set, persist conversation logs here
     log_file: Optional[str] = None

@@ -1,5 +1,5 @@
 """
-✦ Telegram Messenger — Bot interface.
+✦ Telegram Messenger - Bot interface.
 """
 from __future__ import annotations
 

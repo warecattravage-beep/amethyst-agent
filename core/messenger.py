@@ -1,5 +1,5 @@
 """
-✦ Onyx Messenger Base — Interface for all messengers.
+✦ Onyx Messenger Base - Interface for all messengers.
 """
 from __future__ import annotations
 
@@ -41,7 +41,7 @@ class Messenger(ABC):
         ...
 
     async def _handle(self, text: str, meta: dict[str, Any]):
-        """Internal handler — calls registered handler."""
+        """Internal handler - calls registered handler."""
         if self._handler:
             try:
                 await self._handler(text, meta)

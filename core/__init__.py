@@ -1,1 +1,1 @@
-"""✦ Onyx Agent — Core module."""
+"""✦ Onyx Agent - Core module."""

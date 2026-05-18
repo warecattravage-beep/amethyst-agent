@@ -1,1 +1,1 @@
-"""✦ Onyx Agent — Skills module."""
+"""✦ Onyx Agent - Skills module."""

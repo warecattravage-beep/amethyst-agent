@@ -1,5 +1,5 @@
 """
-✦ Signal Messenger — CLI-based Signal interface.
+✦ Signal Messenger - CLI-based Signal interface.
 Uses signal-cli for sending and receiving messages via subprocess.
 """
 from __future__ import annotations
@@ -33,7 +33,7 @@ class SignalMessenger(Messenger):
             return
         self._available = True
         self._running = True
-        log.info("Signal messenger ready — account: %s", self.account)
+        log.info("Signal messenger ready - account: %s", self.account)
 
     async def stop(self):
         self._running = False

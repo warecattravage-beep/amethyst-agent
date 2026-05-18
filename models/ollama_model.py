@@ -1,5 +1,5 @@
 """
-✦ Ollama Model — Local LLM via Ollama.
+✦ Ollama Model - Local LLM via Ollama.
 """
 from __future__ import annotations
 

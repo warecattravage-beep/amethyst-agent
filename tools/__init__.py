@@ -1,8 +1,8 @@
 """Built-in tools for the Onyx agent.
 
 Each tool module exports:
-- `tool_spec` — JSON schema dict (Ollama tools format)
-- `handler(request: dict) -> str` — async callable returning result text
+- `tool_spec` - JSON schema dict (Ollama tools format)
+- `handler(request: dict) -> str` - async callable returning result text
 """
 
 from typing import Any

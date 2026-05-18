@@ -1,5 +1,5 @@
 """
-✦ Onyx Dashboard — CLI/TUI management interface.
+✦ Onyx Dashboard - CLI/TUI management interface.
 """
 from __future__ import annotations
 
@@ -31,7 +31,7 @@ def show_status(config: Config):
     model_cfg = config.get(f"models.{model_name}", {})
 
     # Status table
-    table = Table(title="✦ Onyx Agent — Status", box=box.ROUNDED)
+    table = Table(title="✦ Onyx Agent - Status", box=box.ROUNDED)
     table.add_column("Component", style="cyan")
     table.add_column("Status", style="green")
     table.add_column("Details")
@@ -109,7 +109,7 @@ def show_logs(config: Config, lines: int = 20):
 
 def run_setup(config: Config):
     """Interactive setup wizard."""
-    console.print(Panel("✦ Onyx Agent — Setup Wizard", border_style="cyan"))
+    console.print(Panel("✦ Onyx Agent - Setup Wizard", border_style="cyan"))
 
     # Agent name
     current = config.get("agent_name", "Onyx")

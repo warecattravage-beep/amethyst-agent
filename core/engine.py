@@ -1,5 +1,5 @@
 """
-* Onyx Engine — Core message router and lifecycle manager.
+* Onyx Engine - Core message router and lifecycle manager.
 """
 from __future__ import annotations
 
@@ -89,7 +89,7 @@ SKILL_MAP = {
 
 
 class OnyxEngine:
-    """Main engine — routes messages, manages lifecycle."""
+    """Main engine - routes messages, manages lifecycle."""
 
     def __init__(self, config_path: str | Path = "config.json"):
         self.config = Config(config_path)
@@ -169,7 +169,7 @@ class OnyxEngine:
     # ── ASCII Banner ──
 
     def _print_banner(self):
-        """Print the gateway ASCII art banner (no counts — just the art)."""
+        """Print the gateway ASCII art banner (no counts - just the art)."""
         name = self.config.get("agent_name", "Onyx")
         v = C.VIOLET; nc = C.NC; b = C.BOLD
         print()
@@ -289,7 +289,7 @@ class OnyxEngine:
         final_response = ""
 
         for step in range(max_steps):
-            errors = 0  # reset per step — 2 fresh retries each step
+            errors = 0  # reset per step - 2 fresh retries each step
 
             for retry in range(3):  # original call + up to 2 retries
                 # Get model response (with 120s timeout per step)
@@ -299,14 +299,14 @@ class OnyxEngine:
                     )
                 except asyncio.TimeoutError:
                     log.warning("Autonomous step %d: timed out", step + 1)
-                    final_response = "(Task timed out — try a simpler request?)"
+                    final_response = "(Task timed out - try a simpler request?)"
                     break
 
                 # Check for skill calls
                 skill_result = await self._process_skill_calls(response)
 
                 if not skill_result:
-                    # No skill calls — final answer
+                    # No skill calls - final answer
                     final_response = response
                     break
 
@@ -329,7 +329,7 @@ class OnyxEngine:
                         log.info("Step %d: retry %d/2 after error", step + 1, errors)
                         continue  # go to next retry attempt
 
-                # Success — feed result back for next reasoning round
+                # Success - feed result back for next reasoning round
                 if len(skill_result) > 1500:
                     skill_result = skill_result[:1500] + "\n... (truncated)"
                 messages.append({"role": "assistant", "content": response})
@@ -463,18 +463,18 @@ class OnyxEngine:
             f"*** {self.config.get('agent_name', 'Onyx')} Agent**",
             "",
             "**Commands:**",
-            "/help — This message",
-            "/status — System status",
-            "/models — Available AI models",
-            "/skills — Enabled skills",
-            "/clear — Clear conversation memory",
-            "/update — Pull latest code and update dependencies",
-            "/config — Configuration info",
+            "/help - This message",
+            "/status - System status",
+            "/models - Available AI models",
+            "/skills - Enabled skills",
+            "/clear - Clear conversation memory",
+            "/update - Pull latest code and update dependencies",
+            "/config - Configuration info",
             "",
             "**Skills available:**",
         ]
         for name, skill in self.skills.items():
-            lines.append(f"  • **{name}** — {skill.description[:60]}")
+            lines.append(f"  • **{name}** - {skill.description[:60]}")
         lines.extend([
             "",
             "**Usage:**",
@@ -502,13 +502,13 @@ class OnyxEngine:
             if cfg.get("enabled"):
                 model_name = cfg.get("model", name)
                 active = "← active" if name == self.config.get("active_model") else ""
-                lines.append(f"  • **{name}** — {model_name} {active}")
+                lines.append(f"  • **{name}** - {model_name} {active}")
         return "\n".join(lines)
 
     def _format_skills(self) -> str:
         lines = ["**Enabled Skills:**", ""]
         for name, skill in self.skills.items():
-            lines.append(f"  • **{name}** — {skill.description[:60]}")
+            lines.append(f"  • **{name}** - {skill.description[:60]}")
         return "\n".join(lines)
 
     def _handle_search(self, query: str) -> str:
@@ -606,7 +606,7 @@ class OnyxEngine:
         await self.init_models()
         await self.init_messengers()
 
-        log.info("* Ready — %d skills, %d messengers",
+        log.info("* Ready - %d skills, %d messengers",
                  len(self.skills), len(self.messengers))
         self._print_status_line()
 
@@ -651,7 +651,7 @@ class OnyxEngine:
             await asyncio.sleep(1)
 
     async def _proactive_loop(self):
-        """Send proactive messages when idle — random timing, guaranteed min 1/30min."""
+        """Send proactive messages when idle - random timing, guaranteed min 1/30min."""
         pro = self.config.get("proactive", {})
         if not pro.get("enabled", True):
             return
@@ -710,7 +710,7 @@ class OnyxEngine:
 
             prompts = [
                 "Hey, everything running smoothly. Anything on your mind?",
-                "System's quiet. Just checking in — need anything?",
+                "System's quiet. Just checking in - need anything?",
                 "Been a while since we chatted. All good?",
                 "I'm here if you need me. Just say the word.",
             ]
@@ -753,7 +753,7 @@ class OnyxEngine:
                         # Notify all messengers
                         for m in self.messengers.values():
                             try:
-                                await m.send("", "🔄 Onyx auto-updated — restarting...")
+                                await m.send("", "🔄 Onyx auto-updated - restarting...")
                             except Exception:
                                 pass
                         log.info("Auto-update: restarting...")

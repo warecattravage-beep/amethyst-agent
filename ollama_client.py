@@ -1,4 +1,4 @@
-"""Thin async Ollama client — chat & tool calls via REST API."""
+"""Thin async Ollama client - chat & tool calls via REST API."""
 from __future__ import annotations
 
 import json

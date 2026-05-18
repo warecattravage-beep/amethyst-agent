@@ -1,5 +1,5 @@
 """
-✦ Coding Skill — Write, review, and execute code.
+✦ Coding Skill - Write, review, and execute code.
 """
 from __future__ import annotations
 

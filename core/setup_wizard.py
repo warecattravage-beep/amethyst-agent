@@ -1,6 +1,6 @@
 """
-✦ Onyx Setup Wizard — Lightweight onboarding.
-No rich/Kivy deps — works on any terminal (Linux, Windows, Termux).
+✦ Onyx Setup Wizard - Lightweight onboarding.
+No rich/Kivy deps - works on any terminal (Linux, Windows, Termux).
 """
 from __future__ import annotations
 
@@ -21,7 +21,7 @@ def run_setup(config) -> None:
     """Interactive setup wizard with visual onboarding flow."""
     print()
     print("  ╔═══════════════════════════════════════╗")
-    print("  ║   ✦ Onyx Agent — First-Time Setup   ║")
+    print("  ║   ✦ Onyx Agent - First-Time Setup   ║")
     print("  ╚═══════════════════════════════════════╝")
     print()
     print("  Let's get your agent up and running.")
@@ -109,7 +109,7 @@ def run_setup(config) -> None:
 
     # ── Summary ──
     print("  ╔═══════════════════════════════════════╗")
-    print("  ║   ✅ Onyx Agent — Setup Complete!   ║")
+    print("  ║   ✅ Onyx Agent - Setup Complete!   ║")
     print("  ╚═══════════════════════════════════════╝")
     print()
     print(f"  Agent:    {config.get('agent_name')}")

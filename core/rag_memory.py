@@ -1,5 +1,5 @@
 """
-✦ RAG Memory — Simple keyword-based search over past conversations.
+✦ RAG Memory - Simple keyword-based search over past conversations.
 No external dependencies; uses word matching + frequency scoring.
 """
 from __future__ import annotations

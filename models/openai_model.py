@@ -1,5 +1,5 @@
 """
-✦ OpenAI Model — API-based models (OpenAI, OpenRouter, etc.).
+✦ OpenAI Model - API-based models (OpenAI, OpenRouter, etc.).
 """
 from __future__ import annotations
 

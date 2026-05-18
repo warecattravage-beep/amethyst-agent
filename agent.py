@@ -1,4 +1,4 @@
-"""Onyx Agent — core reasoning loop with tool calling."""
+"""Onyx Agent - core reasoning loop with tool calling."""
 from __future__ import annotations
 
 import json
@@ -64,7 +64,7 @@ class Agent:
                 user_msg="",
                 tools=self.tool_specs if self.tool_specs else None,
             )
-            # Actually we need to handle this differently — pass full messages
+            # Actually we need to handle this differently - pass full messages
             # Let's use the raw API
             resp = await self._raw_chat(messages)
 
@@ -73,7 +73,7 @@ class Agent:
             tool_calls = msg.get("tool_calls", [])
 
             if not tool_calls:
-                # Final response — no more tools needed
+                # Final response - no more tools needed
                 self.memory.add_assistant(content)
                 log_conversation(self.memory.to_ollama_format())
                 return content

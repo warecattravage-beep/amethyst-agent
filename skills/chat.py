@@ -1,5 +1,5 @@
 """
-✦ Chat Skill — General conversation.
+✦ Chat Skill - General conversation.
 """
 from __future__ import annotations
 
@@ -18,5 +18,5 @@ class ChatSkill(Skill):
         super().__init__("chat", config)
 
     async def run(self, context: dict[str, Any], **kwargs) -> str:
-        """Chat is handled by the model directly — no special execution needed."""
+        """Chat is handled by the model directly - no special execution needed."""
         return ""

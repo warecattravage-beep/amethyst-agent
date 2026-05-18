@@ -1,1 +1,1 @@
-"""✦ Onyx Agent — Messengers module."""
+"""✦ Onyx Agent - Messengers module."""

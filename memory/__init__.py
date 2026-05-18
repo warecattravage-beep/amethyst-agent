@@ -1,4 +1,4 @@
-"""Memory subsystem — short-term (conversation) + long-term (file-based)."""
+"""Memory subsystem - short-term (conversation) + long-term (file-based)."""
 from __future__ import annotations
 
 import json

@@ -1,5 +1,5 @@
 """
-✦ Code Review Skill — Read a file and return it for the model to review.
+✦ Code Review Skill - Read a file and return it for the model to review.
 """
 from __future__ import annotations
 

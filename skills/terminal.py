@@ -1,5 +1,5 @@
 """
-✦ Terminal Skill — Execute shell commands.
+✦ Terminal Skill - Execute shell commands.
 """
 from __future__ import annotations
 

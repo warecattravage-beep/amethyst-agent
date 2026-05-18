@@ -1,5 +1,5 @@
 """
-✦ File Skill — Read and write files.
+✦ File Skill - Read and write files.
 """
 from __future__ import annotations
 

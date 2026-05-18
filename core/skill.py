@@ -1,5 +1,5 @@
 """
-✦ Onyx Skill Base — Interface for all skills.
+✦ Onyx Skill Base - Interface for all skills.
 """
 from __future__ import annotations
 

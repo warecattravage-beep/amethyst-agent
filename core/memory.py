@@ -1,5 +1,5 @@
 """
-✦ Onyx Memory — Conversation history manager.
+✦ Onyx Memory - Conversation history manager.
 Stores per-chat message history and trims to keep context size manageable.
 """
 from __future__ import annotations

@@ -1,5 +1,5 @@
 """
-✦ Web Search Skill — Search the internet.
+✦ Web Search Skill - Search the internet.
 """
 from __future__ import annotations
 

@@ -1,5 +1,5 @@
 """
-✦ Discord Messenger — Bot with gateway (real-time messages).
+✦ Discord Messenger - Bot with gateway (real-time messages).
 Uses discord.py client for both sending and receiving.
 """
 from __future__ import annotations

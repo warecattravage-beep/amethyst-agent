@@ -1,5 +1,5 @@
 """
-✦ Onyx Model Base — Interface for all AI models.
+✦ Onyx Model Base - Interface for all AI models.
 """
 from __future__ import annotations
 

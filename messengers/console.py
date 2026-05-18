@@ -1,5 +1,5 @@
 """
-✦ Console Messenger — Local terminal interface.
+✦ Console Messenger - Local terminal interface.
 Falls back to plain print/input when rich is not installed (e.g. Termux).
 """
 from __future__ import annotations
@@ -46,20 +46,20 @@ class ConsoleMessenger(Messenger):
             self.use_rich = True
         except ImportError:
             self.use_rich = False
-            log.info("rich not available — console using plain I/O")
+            log.info("rich not available - console using plain I/O")
         return self.use_rich
 
     async def start(self):
         self._running = True
         if self._try_rich():
             self.rich.print(self._Panel(
-                "✦ Onyx Agent — Console Mode\n"
+                "✦ Onyx Agent - Console Mode\n"
                 "Type your messages. /help for commands, /quit to exit.",
                 title="Onyx",
                 border_style="cyan",
             ))
         else:
-            print(f"\n{VIOLET}✦ Onyx Agent — Console Mode{NC}")
+            print(f"\n{VIOLET}✦ Onyx Agent - Console Mode{NC}")
             print(f"{DIM}Type your messages. /help for commands, /quit to exit.{NC}")
         log.info("Console messenger started")
 

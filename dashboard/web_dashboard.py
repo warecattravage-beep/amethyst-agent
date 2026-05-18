@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-✦ Onyx Web Dashboard — Serves a local web UI for managing Onyx Agent.
+✦ Onyx Web Dashboard - Serves a local web UI for managing Onyx Agent.
 Used automatically on Termux (Android). Access at http://localhost:9091
 """
 from __future__ import annotations
@@ -244,7 +244,7 @@ def run(config_path: str = "config.json"):
     server.config = config
 
     url = f"http://localhost:{PORT}"
-    print(f"\n  ✦ Onyx Dashboard — Web Mode")
+    print(f"\n  ✦ Onyx Dashboard - Web Mode")
     print(f"  ───────────────────────────")
     print(f"  Open in browser: {url}")
     print(f"  Press Ctrl+C to stop\n")

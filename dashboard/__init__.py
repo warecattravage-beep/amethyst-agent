@@ -1,1 +1,1 @@
-"""✦ Onyx Agent — Dashboard module."""
+"""✦ Onyx Agent - Dashboard module."""

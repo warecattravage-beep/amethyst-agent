@@ -1,5 +1,5 @@
 """
-✦ Web Fetch Skill — Read content from URLs.
+✦ Web Fetch Skill - Read content from URLs.
 """
 from __future__ import annotations
 

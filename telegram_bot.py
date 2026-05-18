@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Onyx Agent — Telegram bot interface.
+"""Onyx Agent - Telegram bot interface.
 
 Run:  python telegram_bot.py <BOT_TOKEN>
 
@@ -86,10 +86,10 @@ class TelegramBot:
                 return
             elif text == "/help":
                 await self.send_message(chat_id,
-                    "/reset — Clear history\n"
-                    "/tools — List tools\n"
-                    "/model <name> — Switch model\n"
-                    "/help — This")
+                    "/reset - Clear history\n"
+                    "/tools - List tools\n"
+                    "/model <name> - Switch model\n"
+                    "/help - This")
                 return
             else:
                 return
@@ -112,7 +112,7 @@ class TelegramBot:
 
     async def poll_loop(self):
         """Long-poll for updates."""
-        logger.info("Telegram bot started — polling for updates...")
+        logger.info("Telegram bot started - polling for updates...")
         while self._running:
             try:
                 result = await self._api(

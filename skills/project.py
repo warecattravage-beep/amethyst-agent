@@ -1,5 +1,5 @@
 """
-✦ Project Skill — Create, read, and list multi-file projects.
+✦ Project Skill - Create, read, and list multi-file projects.
 All file operations are confined to ~/Projects/ for safety.
 """
 from __future__ import annotations
@@ -79,7 +79,7 @@ class ProjectSkill(Skill):
             try:
                 full_path.resolve().relative_to(PROJECTS_DIR)
             except ValueError:
-                created.append(f"⛔ {rel_path} — skipped (outside ~/Projects/)")
+                created.append(f"⛔ {rel_path} - skipped (outside ~/Projects/)")
                 continue
 
             try:
@@ -87,7 +87,7 @@ class ProjectSkill(Skill):
                 full_path.write_text(str(content), encoding="utf-8")
                 created.append(f"✅ {rel_path} ({len(str(content))} bytes)")
             except Exception as e:
-                created.append(f"❌ {rel_path} — {e}")
+                created.append(f"❌ {rel_path} - {e}")
 
         if not created:
             return "No files created."

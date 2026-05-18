@@ -1,5 +1,5 @@
 """
-* Onyx Config — Load and manage configuration.
+* Onyx Config - Load and manage configuration.
 """
 from __future__ import annotations
 
