@@ -544,13 +544,23 @@ class OnyxEngine:
         interval_min = pro.get("interval_minutes", 30)
         quiet_start = pro.get("quiet_hours_start", 23)
         quiet_end = pro.get("quiet_hours_end", 8)
-        force_after = interval_min * 60  # force send after this many seconds
+        force_after = interval_min * 60
         last_sent = 0
         import random
+
+        # Daily counter
+        _date = ""
+        _day_count = 0
 
         while self._running:
             await asyncio.sleep(60)
             now = time.time()
+
+            # Reset daily counter at midnight
+            today = datetime.now(timezone(timedelta(hours=9))).strftime("%Y-%m-%d")
+            if today != _date:
+                _date = today
+                _day_count = 0
 
             # Skip if not idle enough
             if now - self._last_msg_time < idle_min * 60:
@@ -573,6 +583,11 @@ class OnyxEngine:
             if elapsed < force_after * 1.2 and random.random() > 0.3:
                 continue
 
+            # Daily limit check
+            max_day = pro.get("max_per_day", 15)
+            if _day_count >= max_day:
+                continue
+
             # Send proactive message
             tg = self.messengers.get("telegram")
             if not tg or not tg.is_running:
@@ -586,7 +601,8 @@ class OnyxEngine:
             ]
             msg = random.choice(prompts)
             last_sent = now
-            log.info("Proactive: %s", msg)
+            _day_count += 1
+            log.info("Proactive: %s (%d/%d)", msg, _day_count, max_day)
             for chat_id in ["8601374613"]:
                 await tg.send(chat_id, msg)
 
