@@ -11,6 +11,27 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+
+# ── ANSI Colors ──
+
+class C:
+    """Terminal colors (ANSI). Falls back to empty strings if not supported."""
+    _support = True
+    try:
+        if not sys.stdout.isatty():
+            _support = False
+    except Exception:
+        _support = False
+
+    VIOLET = "\033[38;5;141m" if _support else ""
+    CYAN = "\033[38;5;51m" if _support else ""
+    GREEN = "\033[38;5;83m" if _support else ""
+    YELLOW = "\033[38;5;227m" if _support else ""
+    RED = "\033[38;5;196m" if _support else ""
+    DIM = "\033[38;5;240m" if _support else ""
+    BOLD = "\033[1m" if _support else ""
+    NC = "\033[0m" if _support else ""
+
 from core.config import Config
 from core.memory import Memory
 from core.messenger import Messenger, MessageHandler
@@ -84,32 +105,53 @@ class OnyxEngine:
         log_dir.mkdir(parents=True, exist_ok=True)
         log_file = self.config.resolve("log_file")
 
-        handlers = [logging.StreamHandler()]
+        # Colored log formatter
+        class ColorFormatter(logging.Formatter):
+            LVL_COLORS = {
+                "DEBUG": C.DIM,
+                "INFO": C.CYAN,
+                "WARNING": C.YELLOW,
+                "ERROR": C.RED,
+                "CRITICAL": C.RED + C.BOLD,
+            }
+
+            def format(self, record):
+                lvl = record.levelname
+                color = self.LVL_COLORS.get(lvl, "")
+                record.levelname = f"{color}{lvl}{C.NC}"
+                msg = super().format(record)
+                return msg
+
+        handler = logging.StreamHandler()
+        handler.setFormatter(ColorFormatter("%(asctime)s %(levelname)s %(name)s: %(message)s"))
+        handlers = [handler]
         try:
-            handlers.append(logging.FileHandler(str(log_file)))
+            fh = logging.FileHandler(str(log_file))
+            fh.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s"))
+            handlers.append(fh)
         except Exception:
             pass
 
-        logging.basicConfig(
-            level=level,
-            format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-            handlers=handlers,
-        )
+        logging.basicConfig(level=level, handlers=handlers)
 
     # ── ASCII Banner ──
 
     def _print_banner(self):
-        """Print the gateway startup banner."""
+        """Print the gateway startup banner in violet."""
         name = self.config.get("agent_name", "Onyx")
+        v = C.VIOLET
+        nc = C.NC
+        b = C.BOLD
+        dim = C.DIM
         print()
-        print("  ██████╗ ███╗   ██╗██╗   ██╗██╗  ██╗")
-        print(" ██╔═══██╗████╗  ██║╚██╗ ██╔╝╚██╗██╔╝")
-        print(" ██║   ██║██╔██╗ ██║ ╚████╔╝  ╚███╔╝")
-        print(" ██║   ██║██║╚██╗██║  ╚██╔╝   ██╔██╗")
-        print(" ╚██████╔╝██║ ╚████║   ██║   ██╔╝ ██╗")
-        print("  ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝")
-        print(f"  ✦ {name} Agent Gateway ✦")
-        print(f"  Skills: {len(self.skills)} | Models: {self.config.get('active_model', '?')} | Messengers: {len(self.messengers)}")
+        print(f"{v}  ██████╗ ███╗   ██╗██╗   ██╗██╗  ██╗{nc}")
+        print(f"{v} ██╔═══██╗████╗  ██║╚██╗ ██╔╝╚██╗██╔╝{nc}")
+        print(f"{v} ██║   ██║██╔██╗ ██║ ╚████╔╝  ╚███╔╝{nc}")
+        print(f"{v} ██║   ██║██║╚██╗██║  ╚██╔╝   ██╔██╗{nc}")
+        print(f"{v} ╚██████╔╝██║ ╚████║   ██║   ██╔╝ ██╗{nc}")
+        print(f"{v}  ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝{nc}")
+        print(f"{b}  ✦ {name} Agent Gateway ✦{nc}")
+        print(f"{dim}  Skills: {len(self.skills)} | Models: {self.config.get('active_model', '?')} | Messengers: {len(self.messengers)}{nc}")
         print()
 
     # ── Initialization ──

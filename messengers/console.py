@@ -11,6 +11,14 @@ from typing import Any
 
 from core.messenger import Messenger
 
+# Color codes (same as engine)
+VIOLET = "\033[38;5;141m"
+GREEN = "\033[38;5;83m"
+CYAN = "\033[38;5;51m"
+NC = "\033[0m"
+BOLD = "\033[1m"
+DIM = "\033[38;5;240m"
+
 log = logging.getLogger("onyx.console")
 
 
@@ -51,8 +59,8 @@ class ConsoleMessenger(Messenger):
                 border_style="cyan",
             ))
         else:
-            print("\n✦ Onyx Agent — Console Mode")
-            print("Type your messages. /help for commands, /quit to exit.")
+            print(f"\n{VIOLET}✦ Onyx Agent — Console Mode{NC}")
+            print(f"{DIM}Type your messages. /help for commands, /quit to exit.{NC}")
         log.info("Console messenger started")
 
     async def stop(self):
@@ -60,7 +68,7 @@ class ConsoleMessenger(Messenger):
         if self.rich:
             self.rich.print("\n[yellow]Goodbye![/]")
         else:
-            print("\nGoodbye!")
+            print(f"\n{CYAN}Goodbye!{NC}")
         log.info("Console messenger stopped")
 
     async def send(self, target: str, text: str, **kwargs):
@@ -74,7 +82,7 @@ class ConsoleMessenger(Messenger):
             ))
             self.rich.print()
         else:
-            print(f"\n─── Onyx ───\n{text}\n────────────\n")
+            print(f"\n{GREEN}─── {BOLD}Onyx{NC}{GREEN} ───{NC}\n{text}\n{DIM}────────────{NC}\n")
 
     async def read_input(self) -> str | None:
         """Read a single line of input."""
@@ -95,5 +103,5 @@ class ConsoleMessenger(Messenger):
         else:
             print()
             for label, value in items:
-                print(f"  {label}: {value}")
+                print(f"  {CYAN}{label}:{NC} {value}")
             print()
