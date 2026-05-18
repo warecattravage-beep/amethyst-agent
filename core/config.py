@@ -80,6 +80,15 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "code_review": {"enabled": True},
     },
 
+    # ── Proactive mode ──
+    "proactive": {
+        "enabled": True,
+        "idle_minutes": 10,       # send after this many mins of silence
+        "interval_minutes": 30,    # don't send again until this passes
+        "quiet_hours_start": 23,   # 11 PM
+        "quiet_hours_end": 8,      # 8 AM
+    },
+
     # ── System ──
     "data_dir": "data",
     "log_file": "data/onyx.log",

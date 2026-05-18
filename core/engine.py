@@ -7,6 +7,7 @@ import asyncio
 import logging
 import os
 import sys
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -95,6 +96,7 @@ class OnyxEngine:
         self._message_queue: asyncio.Queue = asyncio.Queue()
         self._start_time = datetime.now(timezone.utc)
         self._memory = Memory(self.config.resolve("data_dir") / "memory.json")
+        self._last_msg_time = time.time()
 
         # Setup logging
         self._setup_logging()
@@ -258,6 +260,9 @@ class OnyxEngine:
             if response:
                 await self._send(chat_id, response, source)
             return
+
+        # Track activity time
+        self._last_msg_time = time.time()
 
         # Store user message in memory
         self._memory.add(chat_id, "user", text)
@@ -501,6 +506,9 @@ class OnyxEngine:
         if tg and hasattr(tg, "poll"):
             asyncio.create_task(self._telegram_poll_loop(tg))
 
+        # Proactive check-in loop
+        asyncio.create_task(self._proactive_loop())
+
         # Main message processing loop
         await self._message_loop()
 
@@ -526,6 +534,55 @@ class OnyxEngine:
             await tg.poll()
             await asyncio.sleep(1)
 
+    async def _proactive_loop(self):
+        """Send proactive messages when idle."""
+        pro = self.config.get("proactive", {})
+        if not pro.get("enabled", True):
+            return
+        idle_min = pro.get("idle_minutes", 10)
+        interval_min = pro.get("interval_minutes", 30)
+        quiet_start = pro.get("quiet_hours_start", 23)
+        quiet_end = pro.get("quiet_hours_end", 8)
+        last_sent = 0
+
+        while self._running:
+            await asyncio.sleep(60)  # check every minute
+            now = time.time()
+
+            # Skip if not idle enough
+            if now - self._last_msg_time < idle_min * 60:
+                continue
+
+            # Skip if within quiet hours
+            tz_kst = timezone(timedelta(hours=9))
+            hour = datetime.now(tz_kst).hour
+            if quiet_end < hour < quiet_start:
+                continue
+
+            # Skip if sent recently
+            if now - last_sent < interval_min * 60:
+                continue
+
+            # Pick a target (Telegram preferred)
+            tg = self.messengers.get("telegram")
+            if not tg or not tg.is_running:
+                continue
+
+            # Craft a gentle proactive message
+            prompts = [
+                "Hey, everything running smoothly. Anything on your mind?",
+                "System's quiet. Just checking in — need anything?",
+                "Been a while since we chatted. All good?",
+                "I'm here if you need me. Just say the word.",
+            ]
+            import random
+            msg = random.choice(prompts)
+
+            last_sent = now
+            log.info("Proactive ping: %s", msg)
+            for chat_id in ["8601374613"]:
+                await tg.send(chat_id, msg)
+
     async def _message_loop(self):
         """Process messages from the queue."""
         while self._running:
@@ -539,7 +596,6 @@ class OnyxEngine:
             except Exception as e:
                 log.error("Message processing error: %s", e)
 
-        # Shutdown
         await self._shutdown()
 
     async def _shutdown(self):
