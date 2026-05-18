@@ -25,7 +25,7 @@ class TelegramMessenger(Messenger):
 
     async def _api(self, method: str, **kwargs) -> dict | None:
         """Call Telegram API."""
-        if not self._http:
+        if not self._http or not self._running:
             return None
         try:
             r = await self._http.post(
@@ -37,8 +37,12 @@ class TelegramMessenger(Messenger):
             if data.get("ok"):
                 return data.get("result")
             log.warning("Telegram API error: %s", data.get("description", "?"))
+        except httpx.ConnectError:
+            log.debug("Telegram: connection refused (offline?)")
+        except httpx.TimeoutException:
+            log.debug("Telegram: request timed out")
         except Exception as e:
-            log.error("Telegram API call failed: %s", e)
+            log.debug("Telegram API error: %s", e)
         return None
 
     async def start(self):
@@ -50,7 +54,9 @@ class TelegramMessenger(Messenger):
         self._me = await self._api("getMe")
         if self._me:
             log.info("Telegram bot: @%s", self._me.get("username", "?"))
-        self._running = True
+            self._running = True
+        else:
+            log.warning("Telegram: could not reach API (offline or invalid token)")
 
     async def stop(self):
         self._running = False
@@ -59,6 +65,8 @@ class TelegramMessenger(Messenger):
 
     async def send(self, target: str, text: str, **kwargs):
         """Send message to a Telegram chat."""
+        if not self._running:
+            return
         await self._api(
             "sendMessage",
             chat_id=int(target),
@@ -69,6 +77,8 @@ class TelegramMessenger(Messenger):
 
     async def poll(self):
         """Long-poll for incoming messages."""
+        if not self._running:
+            return
         result = await self._api(
             "getUpdates",
             offset=self._offset,
