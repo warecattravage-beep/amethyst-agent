@@ -278,28 +278,38 @@ class OnyxEngine:
             return
 
         # ── Autonomous multi-step loop ──
-        max_steps = 8
+        max_steps = 5
         final_response = ""
 
         for step in range(max_steps):
-            # Get model response
-            response = await self.model.chat(messages)
+            # Get model response (with 45s timeout)
+            try:
+                response = await asyncio.wait_for(
+                    self.model.chat(messages), timeout=45
+                )
+            except asyncio.TimeoutError:
+                log.warning("Autonomous step %d: timed out", step + 1)
+                final_response = "(Task timed out — try a simpler request?)"
+                break
 
             # Check for skill calls
             skill_result = await self._process_skill_calls(response)
 
             if skill_result:
-                # Skill was executed — feed result back for next reasoning round
+                # Trim verbose results
+                if len(skill_result) > 1500:
+                    skill_result = skill_result[:1500] + "\n... (truncated)"
+                # Feed result back for next reasoning round
                 messages.append({"role": "assistant", "content": response})
-                messages.append({"role": "user", "content": f"Tool result:\n{skill_result}\n\nContinue working toward the goal. If done, summarize the final result."})
-                log.info("Autonomous step %d: skill executed", step + 1)
+                messages.append({"role": "user", "content": f"Result:\n{skill_result}\n\nProceed. If done, give final answer."})
+                log.info("Step %d: skill used", step + 1)
             else:
-                # No skill calls — this is the final answer
+                # No skill calls — final answer
                 final_response = response
                 break
 
         if not final_response:
-            final_response = f"(Completed after {max_steps} reasoning steps)"
+            final_response = f"(Done after {max_steps} steps)"
 
         # Store final response in memory
         self._memory.add(chat_id, "assistant", final_response)
