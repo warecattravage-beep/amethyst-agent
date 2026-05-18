@@ -87,6 +87,16 @@ class TelegramMessenger(Messenger):
             disable_notification=kwargs.get("silent", False),
         )
 
+    async def send_action(self, target: str, action: str = "typing"):
+        """Send a chat action (typing indicator)."""
+        if not self._running:
+            return
+        await self._api(
+            "sendChatAction",
+            chat_id=int(target),
+            action=action,
+        )
+
     async def poll(self):
         """Long-poll for incoming messages."""
         if not self._running:

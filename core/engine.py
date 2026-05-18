@@ -238,6 +238,9 @@ class OnyxEngine:
         # Store user message in memory
         self._memory.add(chat_id, "user", text)
 
+        # Show typing indicator (Telegram) before model call
+        await self._send_action(chat_id, source)
+
         # Build conversation context
         messages = self._build_messages(text, meta)
 
@@ -441,6 +444,13 @@ class OnyxEngine:
             console = self.messengers.get("console")
             if console:
                 await console.send(target, text)
+
+    async def _send_action(self, target: str, source: str):
+        """Send a typing indicator before processing."""
+        if source == "telegram":
+            tg = self.messengers.get("telegram")
+            if tg and hasattr(tg, "send_action"):
+                await tg.send_action(target)
 
     # ── Main loop ──
 
