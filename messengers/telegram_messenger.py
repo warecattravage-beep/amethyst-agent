@@ -50,19 +50,24 @@ class TelegramMessenger(Messenger):
             log.warning("Telegram: no token configured")
             return
         import httpx
-        # Try SSL verification first; fall back if certs missing (Termux)
-        try:
-            self._http = httpx.AsyncClient()
-            await self._api("getMe")
-        except Exception:
-            self._http = httpx.AsyncClient(verify=False)
-            log.info("Telegram: using SSL verify=False (no CA certs)")
+
+        # Try with SSL verification first
+        self._http = httpx.AsyncClient(verify=True)
         self._me = await self._api("getMe")
+
+        # Fallback: no SSL cert verification (Termux)
+        if not self._me:
+            await self._http.aclose()
+            self._http = httpx.AsyncClient(verify=False)
+            self._me = await self._api("getMe")
+            if self._me:
+                log.info("Telegram: connected with SSL verify=False")
+
         if self._me:
             log.info("Telegram bot: @%s", self._me.get("username", "?"))
             self._running = True
         else:
-            log.warning("Telegram: could not reach API (offline or invalid token)")
+            log.warning("Telegram: could not reach API (offline/invalid token/SSL)")
 
     async def stop(self):
         self._running = False
