@@ -1,6 +1,9 @@
 __pycache__/
 *.pyc
-*.pyo
+data/
+config.json
 .env
+venv/
+.venv/
+*.log
 .DS_Store
-memory/scratch_notes.md

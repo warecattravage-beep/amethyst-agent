@@ -1,133 +1,89 @@
-# ✦ Onyx Agent
+# ✦ Onyx Agent Gateway
 
-Lightweight AI agent framework running **Gemma 4 E4B** via **Ollama** on Android (Termux) or any Linux device.
-
-**Designed for:** Lenovo Yoga Tab 11 and similar Android tablets.
-
-## Architecture
+**Standalone, cross-platform AI agent gateway.**
+Multi-messenger, multi-model, plugin skills — all in one local app.
 
 ```
-┌─────────────────────────────┐
-│  Termux (Android)           │
-│  ┌───────────────────────┐  │
-│  │  Onyx Agent (Python)  │  │
-│  │  ├─ Agent loop        │  │
-│  │  ├─ Tool system       │  │
-│  │  ├─ Memory (short+lt) │  │
-│  │  └─ CLI/REPL          │  │
-│  └─────────┬─────────────┘  │
-│            │ REST API        │
-│  ┌─────────▼─────────────┐  │
-│  │  Ollama               │  │
-│  │  └─ gemma4:e4b (4.5B) │  │
-│  └───────────────────────┘  │
-└─────────────────────────────┘
+     ██████╗ ███╗   ██╗██╗   ██╗██╗  ██╗
+    ██╔═══██╗████╗  ██║╚██╗ ██╔╝╚██╗██╔╝
+    ██║   ██║██╔██╗ ██║ ╚████╔╝  ╚███╔╝
+    ██║   ██║██║╚██╗██║  ╚██╔╝   ██╔██╗
+    ╚██████╔╝██║ ╚████║   ██║   ██╔╝ ██╗
+     ╚═════╝ ╚═╝  ╚═══╝   ╚═╝   ╚═╝  ╚═╝
+     ✦ Agent Gateway ✦
 ```
 
 ## Features
 
-- **Native function calling** — Gemma 4's built-in tool calling
-- **Short-term memory** — rolling conversation context
-- **Long-term memory** — persisted to `.md` files
-- **6+ built-in tools** — shell, file I/O, web fetch, system info, notes
-- **Plugin-ready** — drop a `.py` file into `plugins/` or `tools/`
-- **Thinking mode** — Gemma 4's configurable reasoning tokens
-- **REPL + single-shot** modes
+- **Multi-messenger** — Console, Telegram, Discord (selectable)
+- **Multi-model** — Ollama (local), OpenAI, Claude (switch anytime)
+- **Plugin skills** — Coding, terminal, web search, web fetch
+- **Dashboards** — Native GUI (Kivy) on desktop, Web UI on Termux/Android
+- **Cross-platform** — Windows, Linux, Android (Termux)
 
-## Quick Start (Termux on Android)
+## Quick Start
 
 ```bash
-# 1. Copy the project to your tablet
-#    (ADB, USB, Syncthing, or git clone)
-
-# 2. Run the setup script
-bash setup_termux.sh
-
-# 3. Start Ollama in the background
-ollama serve &
-
-# 4. Launch Onyx
-python cli.py
-```
-
-## Quick Start (Linux / Desktop)
-
-```bash
-# Install Ollama: https://ollama.com/download
-ollama pull gemma4:e4b
-ollama serve &
-
-pip install httpx
-python cli.py
-```
-
-## Usage
-
-### Interactive REPL
-```bash
-python cli.py
-╰─➤  what's the current system status?
-╰─➤  /tools
-╰─➤  /help
-╰─➤  /quit
-```
-
-### Single turn
-```bash
-python cli.py "list all files in this directory"
+git clone https://github.com/warecattravage-beep/onyx-agent-v3.git
+cd onyx-agent-v3
+bash install.sh
+python3 onyx.py setup
+python3 onyx.py start
 ```
 
 ## Commands
 
-| Command | Description |
-|---------|-------------|
-| `/help` | Show commands |
-| `/reset` | Clear conversation history |
-| `/model <name>` | Switch models |
-| `/tools` | List all available tools |
-| `/config` | Show current config |
-| `/quit` | Exit |
+| Command | What it does |
+|---|---|
+| `python3 onyx.py setup` | Setup wizard |
+| `python3 onyx.py start` | Launch agent |
+| `python3 onyx.py dashboard` | GUI dashboard (Kivy or Web) |
+| `python3 onyx.py dashboard --web` | Force web dashboard |
+| `python3 onyx.py status` | CLI overview |
 
-## Built-in Tools
+## Architecture
 
-- **shell** — Run shell commands on the device
-- **read_file** — Read text files
-- **write_file** — Write text files
-- **web_fetch** — Fetch URLs
-- **system_info** — Device CPU/memory/OS
-- **save_note** — Quick persistent notes
+```
+onyx.py → OnyxEngine
+            ├── messengers/    (console, telegram, discord)
+            ├── models/        (ollama, openai)
+            └── skills/        (coding, terminal, web, chat)
 
-## Adding Tools
-
-Drop a Python file in `tools/` that exports:
-
-```python
-from tools import register_tool
-
-async def my_handler(args: dict) -> str:
-    return "result"
-
-register_tool("my_tool", {
-    "type": "function",
-    "function": {
-        "name": "my_tool",
-        "description": "What it does",
-        "parameters": {"type": "object", "properties": {...}, "required": [...]},
-    },
-}, my_handler)
+dashboard/
+    ├── app.py          Kivy GUI (Windows/Linux)
+    └── web_dashboard.py Web UI (Termux/Android)
 ```
 
-## Why Gemma 4 E4B?
+## Messengers
 
-| Property | Value |
-|----------|-------|
-| Effective params | 4.5B |
-| Total params | ~8B (with embeddings) |
-| Context | 128K tokens |
-| Modalities | Text, Image, Audio |
-| Function calling | ✅ Native |
-| Thinking mode | ✅ Configurable |
-| Designed for | Edge/mobile devices |
+Toggle on/off from the dashboard or `config.json`:
+
+```json
+"messengers": {
+  "console":  {"enabled": true},
+  "telegram": {"enabled": false, "token": "..."},
+  "discord":  {"enabled": false, "token": "..."}
+}
+```
+
+## Models
+
+```json
+"models": {
+  "ollama": {"enabled": true,  "host": "http://localhost:11434", "model": "gemma2:9b"},
+  "openai": {"enabled": false, "api_key": "", "model": "gpt-4o"}
+}
+```
+
+## Skills
+
+| Skill | Description |
+|---|---|
+| `chat` | General conversation (always on) |
+| `coding` | Write + run Python, bash, node |
+| `terminal` | Shell commands (blocklist-safe) |
+| `web_search` | Brave / DuckDuckGo |
+| `web_fetch` | Fetch any URL |
 
 ## License
 
