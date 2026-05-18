@@ -114,16 +114,40 @@ class OnyxEngine:
                 "ERROR": C.RED,
                 "CRITICAL": C.RED + C.BOLD,
             }
+            LVL_SHORT = {
+                "DEBUG": "DBG",
+                "INFO": "INF",
+                "WARNING": "WRN",
+                "ERROR": "ERR",
+                "CRITICAL": "CRT",
+            }
+            NAME_COLORS = {
+                "onyx": "",
+                "onyx.engine": C.VIOLET,
+                "onyx.ollama": C.CYAN,
+                "onyx.telegram": C.GREEN,
+                "onyx.skill": C.YELLOW,
+                "onyx.memory": C.DIM,
+            }
 
             def format(self, record):
-                lvl = record.levelname
-                color = self.LVL_COLORS.get(lvl, "")
-                record.levelname = f"{color}{lvl}{C.NC}"
+                # Short level
+                short = self.LVL_SHORT.get(record.levelname, record.levelname[:3])
+                color = self.LVL_COLORS.get(record.levelname, "")
+                record.levelname = f"{color}{short}{C.NC}"
+                # Short module name
+                name = record.name
+                nc = self.NAME_COLORS.get(name, C.DIM)
+                record.name = f"{nc}{name.split('.')[-1][:6]:>6s}{C.NC}"
+                # Short time (HH:MM only)
+                from datetime import datetime
+                ts = datetime.fromtimestamp(record.created).strftime("%H:%M")
+                record.asctime = ts
                 msg = super().format(record)
                 return msg
 
         handler = logging.StreamHandler()
-        handler.setFormatter(ColorFormatter("%(asctime)s %(levelname)s %(name)s: %(message)s"))
+        handler.setFormatter(ColorFormatter("%(asctime)s %(levelname)s %(name)s %(message)s"))
         handlers = [handler]
         try:
             fh = logging.FileHandler(str(log_file))
