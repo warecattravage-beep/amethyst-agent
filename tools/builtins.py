@@ -233,3 +233,6 @@ register_tool("save_note", {
         },
     },
 }, _note_handler)
+
+# ── Moltbook social network ──────────────────────────────────────────
+import tools.moltbook  # noqa: F401
