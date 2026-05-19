@@ -1,6 +1,6 @@
 """
 ✦ Moltbook — Social network for AI agents.
-Post, comment, upvote, browse feed, and manage your profile.
+Post, comment, upvote, browse feed, register, and manage your profile.
 """
 
 from __future__ import annotations
@@ -11,269 +11,194 @@ import os
 from tools import register_tool
 
 log = logging.getLogger("onyx.tool.moltbook")
-
 API_BASE = "https://www.moltbook.com/api/v1"
 
 
 def _api_key() -> str:
-    """Get Moltbook API key from environment."""
     return os.environ.get("MOLTBOOK_API_KEY") or os.environ.get("MOLTBOOK_KEY") or ""
 
 
 async def _api(method: str, path: str, data: dict = None) -> str:
-    """Make an authenticated request to the Moltbook API."""
     import httpx
-
     key = _api_key()
-    if not key:
-        return "Error: MOLTBOOK_API_KEY not set. Set it in your environment."
-
-    headers = {
-        "Authorization": f"Bearer {key}",
-        "Content-Type": "application/json",
-    }
-
+    headers = {"Content-Type": "application/json"}
+    if key:
+        headers["Authorization"] = f"Bearer {key}"
     url = f"{API_BASE}{path}"
-
-    async with httpx.AsyncClient(timeout=20) as client:
+    async with httpx.AsyncClient(timeout=20) as c:
         try:
             if method == "GET":
-                r = await client.get(url, headers=headers)
+                r = await c.get(url, headers=headers)
             elif method == "POST":
-                r = await client.post(url, headers=headers, json=data or {})
+                r = await c.post(url, headers=headers, json=data or {})
             elif method == "DELETE":
-                r = await client.delete(url, headers=headers)
+                r = await c.delete(url, headers=headers)
             elif method == "PATCH":
-                r = await client.patch(url, headers=headers, json=data or {})
+                r = await c.patch(url, headers=headers, json=data or {})
             else:
-                return f"Error: unsupported method {method}"
-
+                return f"Unsupported method {method}"
             if r.status_code == 429:
                 return "Rate limited. Try again in a minute."
-            if r.status_code >= 500:
-                return f"Moltbook server error ({r.status_code}). Try again later."
-
-            # Truncate very long responses
             text = r.text
             if len(text) > 2500:
                 text = text[:2500] + "\n...(truncated)"
             return text
-
         except httpx.ConnectError:
-            return "Error: cannot reach Moltbook (www.moltbook.com). Check your internet."
-        except httpx.TimeoutException:
-            return "Error: Moltbook request timed out."
+            return "Error: cannot reach Moltbook (www.moltbook.com)."
         except Exception as e:
             return f"Error: {e}"
 
 
-# ── Tool handlers ───────────────────────────────────────────────────
+# ── Register handler (no API key needed) ────────────────────────────
+async def _register_handler(args: dict) -> str:
+    import httpx
+    name = args["name"]
+    desc = args.get("description", "")
+    payload = {"name": name, "description": desc}
+    async with httpx.AsyncClient(timeout=20) as c:
+        try:
+            r = await c.post(f"{API_BASE}/agents/register", json=payload,
+                             headers={"Content-Type": "application/json"})
+            if r.status_code == 429:
+                return f"Rate limited. Retry after: {r.json().get('retry_after_seconds', 'later')}s"
+            data = r.json()
+            if "error" in data:
+                return f"Error: {data.get('message', r.text[:500])}"
+            agent = data.get("agent", {})
+            api_key = agent.get("api_key", "???")
+            claim_url = agent.get("claim_url", "???")
+            code = agent.get("verification_code", "???")
+            lines = [
+                f"Registered on Moltbook as {name}!",
+                "",
+                f"API Key: {api_key}",
+                f"Claim URL: {claim_url}",
+                f"Verification code: {code}",
+                "",
+                "IMPORTANT: Save the API key! Set it as MOLTBOOK_API_KEY env var.",
+                "Send the claim URL to your human so they can verify you on X.",
+            ]
+            return "\n".join(lines)
+        except Exception as e:
+            return f"Error registering: {e}"
 
 
+# ── Other tool handlers ─────────────────────────────────────────────
 async def _feed_handler(args: dict) -> str:
-    """Browse the Moltbook feed."""
     sort = args.get("sort", "hot")
     limit = min(args.get("limit", 25), 50)
-    cursor = args.get("cursor", "")
     path = f"/posts?sort={sort}&limit={limit}"
+    cursor = args.get("cursor")
     if cursor:
         path += f"&cursor={cursor}"
-    result = await _api("GET", path)
-    return f"Moltbook feed ({sort}):\n{result}"
+    return f"Moltbook feed ({sort}):\n{await _api('GET', path)}"
 
 
 async def _post_handler(args: dict) -> str:
-    """Create a post on Moltbook."""
-    payload = {
-        "submolt_name": args["submolt"],
-        "title": args["title"],
-    }
-    if args.get("content"):
-        payload["content"] = args["content"]
-    if args.get("url"):
-        payload["url"] = args["url"]
+    payload = {"submolt_name": args["submolt"], "title": args["title"]}
+    content = args.get("content")
+    if content:
+        payload["content"] = content
+    url = args.get("url")
+    if url:
+        payload["url"] = url
         payload["type"] = "link"
-
-    result = await _api("POST", "/posts", payload)
-    return f"Post result:\n{result}"
+    return f"Post result:\n{await _api('POST', '/posts', payload)}"
 
 
 async def _comment_handler(args: dict) -> str:
-    """Comment on a post."""
     payload = {"content": args["content"]}
-    if args.get("parent_id"):
-        payload["parent_id"] = args["parent_id"]
-
-    result = await _api("POST", f"/posts/{args['post_id']}/comments", payload)
-    return f"Comment result:\n{result}"
+    parent = args.get("parent_id")
+    if parent:
+        payload["parent_id"] = parent
+    post_id = args["post_id"]
+    return f"Comment:\n{await _api('POST', f'/posts/{post_id}/comments', payload)}"
 
 
 async def _upvote_handler(args: dict) -> str:
-    """Upvote a post or comment."""
     obj_type = args.get("type", "post")
     obj_id = args["id"]
-    result = await _api("POST", f"/{obj_type}s/{obj_id}/upvote")
-    return f"Upvote result: {result[:500]}"
+    return f"Upvote:\n{await _api('POST', f'/{obj_type}s/{obj_id}/upvote')}"
 
 
 async def _profile_handler(args: dict) -> str:
-    """View your or another agent's profile."""
-    name = args.get("name", "")
+    name = args.get("name")
     if name:
-        result = await _api("GET", f"/agents/profile?name={name}")
-    else:
-        result = await _api("GET", "/agents/me")
-    return f"Profile:\n{result}"
+        return f"Profile:\n{await _api('GET', f'/agents/profile?name={name}')}"
+    return f"Profile:\n{await _api('GET', '/agents/me')}"
 
 
 async def _search_handler(args: dict) -> str:
-    """Search Moltbook."""
-    query = args["query"]
+    q = args["query"]
     limit = min(args.get("limit", 10), 25)
-    result = await _api("GET", f"/search?q={query}&type=content&limit={limit}")
-    return f"Search results for '{query}':\n{result}"
+    return f"Search '{q}':\n{await _api('GET', f'/search?q={q}&limit={limit}')}"
 
 
 async def _submolts_handler(args: dict) -> str:
-    """List submolts or view a specific submolt."""
-    name = args.get("name", "")
+    name = args.get("name")
     if name:
-        result = await _api("GET", f"/submolts/{name}")
-    else:
-        result = await _api("GET", "/submolts?limit=25")
-    return f"Submolts:\n{result[:2000]}"
+        return f"Submolt:\n{await _api('GET', f'/submolts/{name}')}"
+    return f"Submolts:\n{await _api('GET', '/submolts?limit=25')}"
 
 
-# ── Register tools ─────────────────────────────────────────────────
-
-for tool_name, description, params, handler in [
-    (
-        "moltbook_feed",
-        "Browse the Moltbook social feed. Shows recent posts. Sort options: hot (popular), new (recent), top (all-time best), rising (trending). Use cursor for pagination.",
-        {
-            "sort": {
-                "type": "string",
-                "enum": ["hot", "new", "top", "rising"],
-                "description": "Sort order (default: hot)",
-            },
-            "limit": {
-                "type": "integer",
-                "description": "Number of posts (max 50)",
-            },
-            "cursor": {
-                "type": "string",
-                "description": "Pagination cursor from previous response",
-            },
-        },
-        _feed_handler,
-    ),
-    (
-        "moltbook_post",
-        "Create a post on Moltbook in a specific submolt (community). You need a submolt_name (e.g. 'general', 'aithoughts').",
-        {
-            "submolt": {
-                "type": "string",
-                "description": "Community name to post in (e.g. general, aithoughts)",
-            },
-            "title": {
-                "type": "string",
-                "description": "Post title (max 300 chars)",
-            },
-            "content": {
-                "type": "string",
-                "description": "Post body text (optional)",
-            },
-            "url": {
-                "type": "string",
-                "description": "URL for link posts (optional)",
-            },
-        },
-        _post_handler,
-    ),
-    (
-        "moltbook_comment",
-        "Comment on a Moltbook post. You can reply to an existing comment by providing parent_id.",
-        {
-            "post_id": {
-                "type": "string",
-                "description": "ID of the post to comment on",
-            },
-            "content": {
-                "type": "string",
-                "description": "Comment text",
-            },
-            "parent_id": {
-                "type": "string",
-                "description": "Reply to a specific comment (optional)",
-            },
-        },
-        _comment_handler,
-    ),
-    (
-        "moltbook_upvote",
-        "Upvote a post or comment on Moltbook.",
-        {
-            "id": {
-                "type": "string",
-                "description": "ID of the post or comment to upvote",
-            },
-            "type": {
-                "type": "string",
-                "enum": ["post", "comment"],
-                "description": "Type of item to upvote",
-            },
-        },
-        _upvote_handler,
-    ),
-    (
-        "moltbook_profile",
-        "View your Moltbook profile or another agent's profile. Omit name to see your own.",
-        {
-            "name": {
-                "type": "string",
-                "description": "Agent name to look up (omit for your own profile)",
-            },
-        },
-        _profile_handler,
-    ),
-    (
-        "moltbook_search",
-        "Search Moltbook for posts and comments matching a query.",
-        {
-            "query": {
-                "type": "string",
-                "description": "Search query",
-            },
-            "limit": {
-                "type": "integer",
-                "description": "Max results (max 25)",
-            },
-        },
-        _search_handler,
-    ),
-    (
-        "moltbook_submolts",
-        "List available submolts (communities) or view details of a specific one.",
-        {
-            "name": {
-                "type": "string",
-                "description": "Submolt name to view (omit to list all)",
-            },
-        },
-        _submolts_handler,
-    ),
+# ── Register all tools ──────────────────────────────────────────────
+for name, desc, params, required, handler in [
+    ("moltbook_register",
+     "Register yourself on Moltbook. Call this once to create your account. Returns an API key and claim URL. Give the claim URL to your human to verify.",
+     {"name": {"type": "string", "description": "Your agent name"},
+      "description": {"type": "string", "description": "Short bio"}},
+     ["name"],
+     _register_handler),
+    ("moltbook_feed",
+     "Browse the Moltbook social feed. Sort: hot, new, top, rising.",
+     {"sort": {"type": "string", "enum": ["hot", "new", "top", "rising"]},
+      "limit": {"type": "integer"}, "cursor": {"type": "string"}},
+     [],
+     _feed_handler),
+    ("moltbook_post",
+     "Create a post in a submolt community.",
+     {"submolt": {"type": "string", "description": "Community name"},
+      "title": {"type": "string"}, "content": {"type": "string"},
+      "url": {"type": "string"}},
+     ["submolt", "title"],
+     _post_handler),
+    ("moltbook_comment",
+     "Comment on a post. Set parent_id to reply to a specific comment.",
+     {"post_id": {"type": "string"}, "content": {"type": "string"},
+      "parent_id": {"type": "string"}},
+     ["post_id", "content"],
+     _comment_handler),
+    ("moltbook_upvote",
+     "Upvote a post or comment.",
+     {"id": {"type": "string"}, "type": {"type": "string", "enum": ["post", "comment"]}},
+     ["id"],
+     _upvote_handler),
+    ("moltbook_profile",
+     "View your profile or another agent's profile.",
+     {"name": {"type": "string", "description": "Agent name (omit for your own)"}},
+     [],
+     _profile_handler),
+    ("moltbook_search",
+     "Search Moltbook for posts and comments.",
+     {"query": {"type": "string", "description": "Search query"},
+      "limit": {"type": "integer"}},
+     ["query"],
+     _search_handler),
+    ("moltbook_submolts",
+     "List submolts or view details of one.",
+     {"name": {"type": "string", "description": "Submolt name to view"}},
+     [],
+     _submolts_handler),
 ]:
-    register_tool(tool_name, {
+    register_tool(name, {
         "type": "function",
         "function": {
-            "name": tool_name,
-            "description": description,
+            "name": name,
+            "description": desc,
             "parameters": {
                 "type": "object",
                 "properties": params,
-                "required": [k for k, v in params.items() if k in {
-                    "submolt", "title", "post_id", "content", "id", "query",
-                }],
+                "required": required,
             },
         },
     }, handler)
