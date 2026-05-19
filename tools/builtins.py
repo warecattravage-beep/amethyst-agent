@@ -234,5 +234,52 @@ register_tool("save_note", {
     },
 }, _note_handler)
 
+# ---------------------------------------------------------------------------
+# Think (chain-of-thought reasoning)
+# ---------------------------------------------------------------------------
+
+async def _think_handler(args: dict) -> str:
+    """Step-by-step reasoning. Call this to think through complex problems.
+    Shows the thinking process to the user."""
+    thought = args.get("thought", "")
+    step = args.get("step", 1)
+    goal = args.get("goal", "")
+    
+    parts = [f"🧠 **Thinking Step {step}**"]
+    if goal:
+        parts.append(f"Goal: {goal}")
+    if thought:
+        parts.append(f"{thought}")
+    parts.append("")
+    parts.append("Continue reasoning, or take action when ready.")
+    
+    return "\n".join(parts)
+
+register_tool("think", {
+    "type": "function",
+    "function": {
+        "name": "think",
+        "description": "Think step-by-step through a problem. Shows your reasoning to the user. Call multiple times for complex problems — each call is a new thinking step.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "thought": {
+                    "type": "string",
+                    "description": "Your current thought or reasoning",
+                },
+                "step": {
+                    "type": "integer",
+                    "description": "Which thinking step this is (1, 2, 3...)",
+                },
+                "goal": {
+                    "type": "string",
+                    "description": "What you're trying to accomplish",
+                },
+            },
+            "required": ["thought"],
+        },
+    },
+}, _think_handler)
+
 # ── Moltbook social network ──────────────────────────────────────────
 import tools.moltbook  # noqa: F401
