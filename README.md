@@ -4,13 +4,11 @@
 > Multi-messenger, multi-model, plugin skills, configurable persona, and proactive conversation. All local, all yours.
 
 ```
-    ██████╗  ███╗  ██╗ ██╗  ██╗ ██╗  ██╗
-   ██╔═══██╗ ████╗ ██║ ╚██╗ ██╔╝ ╚██╗██╔╝
-   ██║   ██║ ██╔██╗██║  ╚████╔╝   ╚███╔╝
-   ██║   ██║ ██║╚████║   ╚██╔╝    ██╔██╗
-   ╚██████╔╝ ██║ ╚███║    ██║    ██╔╝ ██╗
-    ╚═════╝  ╚═╝  ╚══╝    ╚═╝    ╚═╝  ╚═╝
-           ✦ Amethyst Agent Gateway ✦
+  ╔══════════════════════════════════════════════════╗
+  ║                                                  ║
+  ║       ◇   ✦   Amethyst Agent   ✦   ◇         ║
+  ║                                                  ║
+  ╚══════════════════════════════════════════════════╝
 ```
 
 ---
@@ -63,8 +61,8 @@ Remembers past messages per chat (up to 10 exchanges). Ask a question, follow up
 
 **Linux / Termux:**
 ```bash
-git clone https://github.com/warecattravage-beep/amethyst-agent-v3.git
-cd amethyst-agent-v3
+git clone https://github.com/warecattravage-beep/amethyst-agent.git
+cd amethyst-agent
 bash install.sh
 amethyst setup
 amethyst start
@@ -72,8 +70,8 @@ amethyst start
 
 **Windows:**
 ```powershell
-git clone https://github.com/warecattravage-beep/amethyst-agent-v3.git
-cd amethyst-agent-v3
+git clone https://github.com/warecattravage-beep/amethyst-agent.git
+cd amethyst-agent
 pip install httpx kivy openai
 python amethyst.py setup
 python amethyst.py start
@@ -188,7 +186,7 @@ The web dashboard is a full SPA with tabs for Status, Messengers, Models, Skills
 ## 🏗️ Architecture
 
 ```
-📁 amethyst-agent/
+📁 amethyst/
 ├── 📄 amethyst.py              CLI entry (also at $PREFIX/bin/amethyst)
 ├── 📄 config.json          All settings
 ├── 📄 install.sh           Cross-platform installer
@@ -233,16 +231,16 @@ The web dashboard is a full SPA with tabs for Status, Messengers, Models, Skills
 **Linux:**
 ```bash
 sudo apt install python3 python3-pip git
-git clone https://github.com/warecattravage-beep/amethyst-agent-v3.git
-cd amethyst-agent-v3
+git clone https://github.com/warecattravage-beep/amethyst-agent.git
+cd amethyst-agent
 bash install.sh
 ```
 
 **Windows:**
 ```powershell
 pip install httpx kivy openai
-git clone https://github.com/warecattravage-beep/amethyst-agent-v3.git
-cd amethyst-agent-v3
+git clone https://github.com/warecattravage-beep/amethyst-agent.git
+cd amethyst-agent
 python amethyst.py setup
 python amethyst.py start
 ```
@@ -250,8 +248,8 @@ python amethyst.py start
 **Termux (Android):**
 ```bash
 pkg install python git
-git clone https://github.com/warecattravage-beep/amethyst-agent-v3.git
-cd amethyst-agent-v3
+git clone https://github.com/warecattravage-beep/amethyst-agent.git
+cd amethyst-agent
 bash install.sh
 amethyst setup
 amethyst start
