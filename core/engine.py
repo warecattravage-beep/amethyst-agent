@@ -173,11 +173,12 @@ class AmethystEngine:
         name = self.config.get("agent_name", "Amethyst")
         v = C.VIOLET; nc = C.NC; b = C.BOLD
         print()
-        print(f"{v}  ╔══════════════════════════════════════════════════╗{nc}")
-        print(f"{v}  ║                                                  ║{nc}")
-        print(f"{v}  ║       ◇   ✦   {b}{name} Agent{nc}{v}   ✦   ◇         ║{nc}")
-        print(f"{v}  ║                                                  ║{nc}")
-        print(f"{v}  ╚══════════════════════════════════════════════════╝{nc}")
+        print(f"{v}    ___    __  _________________  ____  _____________{nc}")
+        print(f"{v}   /   |  /  |/  / ____/_  __/ / / /\ \/ / ___/_  __/{nc}")
+        print(f"{v}  / /| | / /|_/ / __/   / / / /_/ /  \  /\__ \ / /   {nc}")
+        print(f"{v} / ___ |/ /  / / /___  / / / __  /   / /___/ // /    {nc}")
+        print(f"{v}/_/  |_/_/  /_/_____/ /_/ /_/ /_/   /_//____//_/     {nc}")
+        print(f"{v}                  \u2726 {name} Agent{nc}")
         print()
 
     def _print_status_line(self):

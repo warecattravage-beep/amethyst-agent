@@ -1,15 +1,15 @@
+```
+    ___    __  _________________  ____  _____________
+   /   |  /  |/  / ____/_  __/ / / /\ \/ / ___/_  __/
+  / /| | / /|_/ / __/   / / / /_/ /  \  /\__ \ / /   
+ / ___ |/ /  / / /___  / / / __  /   / /___/ // /    
+/_/  |_/_/  /_/_____/ /_/ /_/ /_/   /_//____//_/     
+```
+
 # ✦ Amethyst Agent Gateway
 
 > **Your own personal AI agent — runs entirely on your machine.**
 > Multi-messenger, multi-model, plugin skills, configurable persona, and proactive conversation. All local, all yours.
-
-```
-  ╔══════════════════════════════════════════════════╗
-  ║                                                  ║
-  ║       ◇   ✦   Amethyst Agent   ✦   ◇         ║
-  ║                                                  ║
-  ╚══════════════════════════════════════════════════╝
-```
 
 ---
 
