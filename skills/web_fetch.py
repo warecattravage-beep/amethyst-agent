@@ -8,7 +8,7 @@ from typing import Any
 
 from core.skill import Skill
 
-log = logging.getLogger("onyx.skill.web_fetch")
+log = logging.getLogger("amethyst.skill.web_fetch")
 
 
 class WebFetchSkill(Skill):
@@ -27,7 +27,7 @@ class WebFetchSkill(Skill):
         try:
             async with httpx.AsyncClient(timeout=20, follow_redirects=True) as c:
                 r = await c.get(url, headers={
-                    "User-Agent": "Mozilla/5.0 (compatible; OnyxAgent/1.0)"
+                    "User-Agent": "Mozilla/5.0 (compatible; AmethystAgent/1.0)"
                 })
                 if r.status_code != 200:
                     return f"Error: HTTP {r.status_code}"

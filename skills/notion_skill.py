@@ -10,7 +10,7 @@ from typing import Any
 
 from core.skill import Skill
 
-log = logging.getLogger("onyx.skill.notion")
+log = logging.getLogger("amethyst.skill.notion")
 
 NOTION_API_BASE = "https://api.notion.com/v1"
 NOTION_VERSION = "2022-06-28"

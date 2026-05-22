@@ -14,7 +14,7 @@ from typing import Any
 
 from core.skill import Skill
 
-log = logging.getLogger("onyx.skill.coding")
+log = logging.getLogger("amethyst.skill.coding")
 
 
 class CodingSkill(Skill):

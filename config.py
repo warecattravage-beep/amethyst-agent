@@ -1,4 +1,4 @@
-"""Onyx Agent - configuration"""
+"""Amethyst Agent - configuration"""
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -8,7 +8,7 @@ class Config:
     ollama_host: str = "http://localhost:11434"
     model: str = "gemma4:e4b"
     system_prompt: str = (
-        "You are Onyx, a capable AI agent running on a mobile device. "
+        "You are Amethyst, a capable AI agent running on a mobile device. "
         "You are helpful, efficient, and proactive. "
         "You have access to tools you can call to accomplish tasks. "
         "When you use a tool, wait for its result before continuing. "

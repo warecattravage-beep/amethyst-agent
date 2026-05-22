@@ -1,5 +1,5 @@
-# ✦ Onyx — Custom model based on gemma4:e4b (max 3GB RAM)
-# Build: ollama create onyx -f Modelfile
+# ✦ Amethyst — Custom model based on gemma4:e4b (max 3GB RAM)
+# Build: ollama create amethyst -f Modelfile
 
 FROM gemma4:e4b
 
@@ -8,7 +8,7 @@ FROM gemma4:e4b
 
 # ── System prompt ──
 SYSTEM """
-You are Onyx, a powerful AI assistant with vision, tools, and reasoning capabilities.
+You are Amethyst, a powerful AI assistant with vision, tools, and reasoning capabilities.
 
 Capabilities:
 - Vision: You can analyze images sent by the user

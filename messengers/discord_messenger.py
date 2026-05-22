@@ -10,7 +10,7 @@ from typing import Any
 
 from core.messenger import Messenger
 
-log = logging.getLogger("onyx.discord")
+log = logging.getLogger("amethyst.discord")
 
 
 class DiscordMessenger(Messenger):
@@ -31,7 +31,7 @@ class DiscordMessenger(Messenger):
             intents = discord.Intents.default()
             intents.message_content = True
 
-            class OnyxBot(discord.Client):
+            class AmethystBot(discord.Client):
                 def __init__(self, messenger):
                     super().__init__(intents=intents)
                     self.messenger = messenger
@@ -58,7 +58,7 @@ class DiscordMessenger(Messenger):
                         "message_id": msg.id,
                     })
 
-            self._client = OnyxBot(self)
+            self._client = AmethystBot(self)
             asyncio.create_task(self._client.start(self.token))
             # Wait for ready
             try:

@@ -12,7 +12,7 @@ from typing import Any
 
 from core.messenger import Messenger
 
-log = logging.getLogger("onyx.signal")
+log = logging.getLogger("amethyst.signal")
 
 
 class SignalMessenger(Messenger):

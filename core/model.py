@@ -1,5 +1,5 @@
 """
-✦ Onyx Model Base - Interface for all AI models.
+✦ Amethyst Model Base - Interface for all AI models.
 """
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Any
 
-log = logging.getLogger("onyx.model")
+log = logging.getLogger("amethyst.model")
 
 
 class Model(ABC):

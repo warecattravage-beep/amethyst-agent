@@ -1,1 +1,1 @@
-"""✦ Onyx Agent - Dashboard module."""
+"""✦ Amethyst Agent - Dashboard module."""

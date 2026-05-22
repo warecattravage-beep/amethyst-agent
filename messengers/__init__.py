@@ -1,1 +1,1 @@
-"""✦ Onyx Agent - Messengers module."""
+"""✦ Amethyst Agent - Messengers module."""

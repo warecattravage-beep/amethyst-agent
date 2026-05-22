@@ -9,7 +9,7 @@ from typing import Any
 
 from core.skill import Skill
 
-log = logging.getLogger("onyx.skill.file")
+log = logging.getLogger("amethyst.skill.file")
 
 # Allowed base directories for file operations
 ALLOWED_PATHS = [

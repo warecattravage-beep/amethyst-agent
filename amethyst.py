@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """
-* Onyx Agent - Standalone cross-platform agent gateway.
+* Amethyst Agent - Standalone cross-platform agent gateway.
 
 Usage:
-    python onyx.py start       Launch the agent
-    python onyx.py setup       Run setup wizard
-    python onyx.py status      CLI dashboard
-    python onyx.py dashboard   Launch GUI dashboard app
-    python onyx.py config      Edit config file
+    python amethyst.py start       Launch the agent
+    python amethyst.py setup       Run setup wizard
+    python amethyst.py status      CLI dashboard
+    python amethyst.py dashboard   Launch GUI dashboard app
+    python amethyst.py config      Edit config file
 """
 from __future__ import annotations
 
@@ -19,23 +19,23 @@ import sys
 from pathlib import Path
 
 # ── Find project root ──
-# The script may be symlinked or copied (e.g. $PREFIX/bin/onyx).
+# The script may be symlinked or copied (e.g. $PREFIX/bin/amethyst).
 # Search for the actual project directory containing core/
 _script = Path(__file__).resolve()
 ROOT = _script.parent
 # If we're in a system bin dir, look for the project in home
 if not (ROOT / "core").is_dir():
     for candidate in [
-        Path.home() / "onyx-agent-v3",
-        Path.home() / "onyx",
-        _script.parent.parent / "onyx-agent-v3",
+        Path.home() / "amethyst-agent-v3",
+        Path.home() / "amethyst",
+        _script.parent.parent / "amethyst-agent-v3",
     ]:
         if (candidate / "core").is_dir():
             ROOT = candidate
             break
 sys.path.insert(0, str(ROOT))
 
-log = logging.getLogger("onyx")
+log = logging.getLogger("amethyst")
 
 
 # ── Platform detection ──
@@ -48,10 +48,18 @@ def _is_termux() -> bool:
 # ── Commands ──
 
 def cmd_start(args):
-    """Start the Onyx Agent."""
+    """Start the Amethyst Agent."""
     from core.config import Config
-    from core.engine import OnyxEngine
-    engine = OnyxEngine(args.config)
+    from core.engine import AmethystEngine
+    engine = AmethystEngine(args.config)
+
+    # Print dashboard URL before entering run loop
+    print()
+    print("  ✦ Amethyst Agent running")
+    print(f"  Dashboard: http://localhost:9091")
+    print("  (run `python amethyst.py dashboard` to open)")
+    print()
+
     try:
         asyncio.run(engine.run())
     except KeyboardInterrupt:
@@ -116,13 +124,13 @@ def cmd_help():
 
 def main():
     parser = argparse.ArgumentParser(
-        description="* Onyx Agent - Standalone AI agent gateway",
+        description="* Amethyst Agent - Standalone AI agent gateway",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  python onyx.py setup         First-time configuration
-  python onyx.py start         Launch the agent
-  python onyx.py status        Dashboard overview
+  python amethyst.py setup         First-time configuration
+  python amethyst.py start         Launch the agent
+  python amethyst.py status        Dashboard overview
         """,
     )
     parser.add_argument(

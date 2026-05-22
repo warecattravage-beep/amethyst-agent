@@ -1,5 +1,5 @@
 """
-✦ Onyx Messenger Base - Interface for all messengers.
+✦ Amethyst Messenger Base - Interface for all messengers.
 """
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Callable, Any
 
-log = logging.getLogger("onyx.messenger")
+log = logging.getLogger("amethyst.messenger")
 
 MessageHandler = Callable[[str, dict[str, Any]], None]
 

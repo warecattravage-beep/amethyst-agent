@@ -1,11 +1,11 @@
 #!/data/data/com.termux/files/usr/bin/bash
 # ───────────────────────────────────────────────────────────
-# Onyx Agent — Termux setup for Android
+# Amethyst Agent — Termux setup for Android
 # Run this in Termux on your Lenovo Yoga Tab 11
 # ───────────────────────────────────────────────────────────
 set -e
 
-echo "✦ Onyx Agent — Android/Termux Setup"
+echo "✦ Amethyst Agent — Android/Termux Setup"
 echo
 
 # ── 1. Update & install packages ──────────────────────────

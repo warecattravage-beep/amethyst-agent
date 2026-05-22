@@ -10,7 +10,7 @@ from typing import Any
 
 from core.skill import Skill
 
-log = logging.getLogger("onyx.skill.web_search")
+log = logging.getLogger("amethyst.skill.web_search")
 
 
 class WebSearchSkill(Skill):

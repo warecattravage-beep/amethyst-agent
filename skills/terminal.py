@@ -9,7 +9,7 @@ from typing import Any
 
 from core.skill import Skill
 
-log = logging.getLogger("onyx.skill.terminal")
+log = logging.getLogger("amethyst.skill.terminal")
 
 # Commands that are always blocked for safety
 BLOCKED_PREFIXES = [

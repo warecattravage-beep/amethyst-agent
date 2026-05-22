@@ -11,7 +11,7 @@ from typing import Any
 
 from core.skill import Skill
 
-log = logging.getLogger("onyx.skill.project")
+log = logging.getLogger("amethyst.skill.project")
 
 PROJECTS_DIR = Path.home() / "Projects"
 

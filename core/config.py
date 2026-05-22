@@ -1,5 +1,5 @@
 """
-* Onyx Config - Load and manage configuration.
+* Amethyst Config - Load and manage configuration.
 """
 from __future__ import annotations
 
@@ -9,11 +9,11 @@ import os
 from pathlib import Path
 from typing import Any
 
-log = logging.getLogger("onyx.config")
+log = logging.getLogger("amethyst.config")
 
 DEFAULT_CONFIG: dict[str, Any] = {
     # ── Agent identity ──
-    "agent_name": "Onyx",
+    "agent_name": "Amethyst",
     "agent_vibe": "Helpful, efficient AI assistant with coding skills.",
 
     # ── Active messenger ──
@@ -23,7 +23,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
     "messengers": {
         "console": {
             "enabled": True,
-            "prompt": "onyx> ",
+            "prompt": "amethyst> ",
         },
         "telegram": {
             "enabled": False,
@@ -48,7 +48,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "ollama": {
             "enabled": True,
             "host": "http://localhost:11434",
-            "model": "onyx",
+            "model": "amethyst",
             "timeout": 60,
         },
         "openai": {
@@ -94,7 +94,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
 
     # ── System ──
     "data_dir": "data",
-    "log_file": "data/onyx.log",
+    "log_file": "data/amethyst.log",
     "log_level": "INFO",
 }
 
@@ -109,7 +109,7 @@ def resolve_path(path: str | Path, base: Path | None = None) -> Path:
 
 
 class Config:
-    """Onyx Agent configuration."""
+    """Amethyst Agent configuration."""
 
     def __init__(self, path: str | Path = "config.json"):
         self.path = Path(path)

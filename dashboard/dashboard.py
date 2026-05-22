@@ -1,5 +1,5 @@
 """
-✦ Onyx Dashboard - CLI/TUI management interface.
+✦ Amethyst Dashboard - CLI/TUI management interface.
 """
 from __future__ import annotations
 
@@ -26,12 +26,12 @@ console = Console()
 
 
 def show_status(config: Config):
-    """Show Onyx Agent status dashboard."""
+    """Show Amethyst Agent status dashboard."""
     model_name = config.get("active_model", "none")
     model_cfg = config.get(f"models.{model_name}", {})
 
     # Status table
-    table = Table(title="✦ Onyx Agent - Status", box=box.ROUNDED)
+    table = Table(title="✦ Amethyst Agent - Status", box=box.ROUNDED)
     table.add_column("Component", style="cyan")
     table.add_column("Status", style="green")
     table.add_column("Details")
@@ -48,7 +48,7 @@ def show_status(config: Config):
             token = cfg.get("token", "")
             detail = f"token: {token[:8]}..." if token else "not set"
         elif name == "console":
-            detail = f"prompt: {cfg.get('prompt', 'onyx> ')}"
+            detail = f"prompt: {cfg.get('prompt', 'amethyst> ')}"
         table.add_row(f"Messenger: {name}", icon, detail)
 
     # Skills status
@@ -109,10 +109,10 @@ def show_logs(config: Config, lines: int = 20):
 
 def run_setup(config: Config):
     """Interactive setup wizard."""
-    console.print(Panel("✦ Onyx Agent - Setup Wizard", border_style="cyan"))
+    console.print(Panel("✦ Amethyst Agent - Setup Wizard", border_style="cyan"))
 
     # Agent name
-    current = config.get("agent_name", "Onyx")
+    current = config.get("agent_name", "Amethyst")
     name = input(f"Agent name [{current}]: ").strip() or current
     config.set("agent_name", name)
 
@@ -148,7 +148,7 @@ def run_setup(config: Config):
         config.set("models.ollama.model", ollama_model)
 
     console.print("\n[green]✅ Setup complete![/]")
-    console.print("Run [bold]onyx start[/] to launch the agent.")
+    console.print("Run [bold]amethyst start[/] to launch the agent.")
 
 
 def main():
@@ -157,13 +157,13 @@ def main():
 
     if not config_path.exists():
         console.print("[yellow]No config.json found. Run setup first:[/]")
-        console.print("  [bold]python onyx.py setup[/]")
+        console.print("  [bold]python amethyst.py setup[/]")
         return
 
     config = Config(config_path)
 
     while True:
-        console.print("\n[bold cyan]✦ Onyx Dashboard[/]")
+        console.print("\n[bold cyan]✦ Amethyst Dashboard[/]")
         console.print("1. Status")
         console.print("2. View config")
         console.print("3. Edit config")

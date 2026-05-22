@@ -1,4 +1,4 @@
-"""Onyx Agent - core reasoning loop with tool calling."""
+"""Amethyst Agent - core reasoning loop with tool calling."""
 from __future__ import annotations
 
 import json
@@ -11,7 +11,7 @@ from config import config
 from memory import ConversationMemory, LongTermMemory, log_conversation
 from tools import TOOL_REGISTRY, get_tool_specs, run_tool
 
-logger = logging.getLogger("onyx")
+logger = logging.getLogger("amethyst")
 
 
 class Agent:

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-# ── ✦ Onyx Agent — Smart Installer ──
+# ── ✦ Amethyst Agent — Smart Installer ──
 # Cross-platform: Linux / Windows / Termux (Android)
 # Installs deps, creates config, sets up dashboard mode per platform.
 
@@ -101,7 +101,7 @@ case "$PLATFORM" in
         python3 -m pip install --user kivy httpx openai anthropic 2>/dev/null || true
         echo -e "  ${GREEN}✓ Linux ready${NC}"
         echo -e "  ${CYAN}  Dashboard: Kivy GUI${NC}"
-        echo -e "  ${CYAN}  Web mode:   python3 onyx.py dashboard --web${NC}"
+        echo -e "  ${CYAN}  Web mode:   python3 amethyst.py dashboard --web${NC}"
         ;;
 
     windows|wsl)
@@ -128,11 +128,11 @@ if [ ! -f "config.json" ]; then
     else
         cat > config.json << 'EOF'
 {
-  "agent_name": "Onyx",
+  "agent_name": "Amethyst",
   "active_model": "ollama",
   "active_messengers": ["console"],
   "messengers": {
-    "console": {"enabled": true, "prompt": "onyx> "},
+    "console": {"enabled": true, "prompt": "amethyst> "},
     "telegram": {"enabled": false, "token": ""},
     "discord": {"enabled": false, "token": ""},
     "signal": {"enabled": false, "cli_path": "signal-cli", "account": ""}
@@ -149,7 +149,7 @@ if [ ! -f "config.json" ]; then
     "web_fetch": {"enabled": true}
   },
   "data_dir": "data",
-  "log_file": "data/onyx.log",
+  "log_file": "data/amethyst.log",
   "log_level": "INFO"
 }
 EOF
@@ -157,19 +157,19 @@ EOF
     fi
 fi
 
-chmod +x onyx.py
+chmod +x amethyst.py
 
-# ── Make 'onyx' command available system-wide ──
+# ── Make 'amethyst' command available system-wide ──
 if [ -d "$PREFIX/bin" ] && [ -n "$PREFIX" ]; then
     # Termux: copy to $PREFIX/bin (always in PATH)
-    cp "$SCRIPT_DIR/onyx.py" "$PREFIX/bin/onyx"
-    chmod +x "$PREFIX/bin/onyx"
-    echo -e "  ${GREEN}✓ Installed: onyx → $PREFIX/bin/onyx${NC}"
+    cp "$SCRIPT_DIR/amethyst.py" "$PREFIX/bin/amethyst"
+    chmod +x "$PREFIX/bin/amethyst"
+    echo -e "  ${GREEN}✓ Installed: amethyst → $PREFIX/bin/amethyst${NC}"
 elif [ -d "/usr/local/bin" ]; then
     # Linux/macOS: symlink into /usr/local/bin
-    sudo ln -sf "$SCRIPT_DIR/onyx.py" "/usr/local/bin/onyx" 2>/dev/null || \
-        ln -sf "$SCRIPT_DIR/onyx.py" "$HOME/.local/bin/onyx" 2>/dev/null || true
-    echo -e "  ${GREEN}✓ Installed: onyx → /usr/local/bin/onyx${NC}"
+    sudo ln -sf "$SCRIPT_DIR/amethyst.py" "/usr/local/bin/amethyst" 2>/dev/null || \
+        ln -sf "$SCRIPT_DIR/amethyst.py" "$HOME/.local/bin/amethyst" 2>/dev/null || true
+    echo -e "  ${GREEN}✓ Installed: amethyst → /usr/local/bin/amethyst${NC}"
 else
     # Fallback: add to PATH in shell config
     SHELL_RC="$HOME/.bashrc"
@@ -177,7 +177,7 @@ else
     PATH_LINE="export PATH=\"\$PATH:$SCRIPT_DIR\""
     if ! grep -q "$SCRIPT_DIR" "$SHELL_RC" 2>/dev/null; then
         echo "" >> "$SHELL_RC"
-        echo "# Onyx Agent" >> "$SHELL_RC"
+        echo "# Amethyst Agent" >> "$SHELL_RC"
         echo "$PATH_LINE" >> "$SHELL_RC"
         echo -e "  ${GREEN}✓ Added to PATH in $SHELL_RC${NC}"
     fi
@@ -186,15 +186,15 @@ fi
 # ── Done ──
 echo ""
 echo -e "${GREEN}  ═══════════════════════════════════════${NC}"
-echo -e "${GREEN}   ✦ Onyx Agent Gateway — Installed! ✦${NC}"
+echo -e "${GREEN}   ✦ Amethyst Agent Gateway — Installed! ✦${NC}"
 echo -e "${GREEN}  ═══════════════════════════════════════${NC}"
 echo ""
 echo -e "  ${BOLD}Quick Start:${NC}"
 echo -e "  ${CYAN}  source $SHELL_RC${NC}           Reload shell config"
-echo -e "  ${CYAN}  onyx setup${NC}                 First-time config"
-echo -e "  ${CYAN}  onyx start${NC}                 Launch the agent"
-echo -e "  ${CYAN}  onyx dashboard${NC}             Open dashboard"
-echo -e "  ${CYAN}  onyx config${NC}                Edit config"
+echo -e "  ${CYAN}  amethyst setup${NC}                 First-time config"
+echo -e "  ${CYAN}  amethyst start${NC}                 Launch the agent"
+echo -e "  ${CYAN}  amethyst dashboard${NC}             Open dashboard"
+echo -e "  ${CYAN}  amethyst config${NC}                Edit config"
 echo ""
 echo -e "  ${BOLD}Gateway Features:${NC}"
 echo -e "  • Multi-messenger routing (Telegram / Discord / Console)"
@@ -207,7 +207,7 @@ case "$PLATFORM" in
     termux|linux)
         read -p "  Run setup wizard now? [Y/n]: " ans
         if [ "${ans:-Y}" != "n" ] && [ "${ans:-Y}" != "N" ]; then
-            $PYTHON onyx.py setup
+            $PYTHON amethyst.py setup
         fi
         ;;
 esac

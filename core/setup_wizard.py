@@ -1,5 +1,5 @@
 """
-✦ Onyx Setup Wizard - Lightweight onboarding.
+✦ Amethyst Setup Wizard - Lightweight onboarding.
 No rich/Kivy deps - works on any terminal (Linux, Windows, Termux).
 """
 from __future__ import annotations
@@ -21,7 +21,7 @@ def run_setup(config) -> None:
     """Interactive setup wizard with visual onboarding flow."""
     print()
     print("  ╔═══════════════════════════════════════╗")
-    print("  ║   ✦ Onyx Agent - First-Time Setup   ║")
+    print("  ║   ✦ Amethyst Agent - First-Time Setup   ║")
     print("  ╚═══════════════════════════════════════╝")
     print()
     print("  Let's get your agent up and running.")
@@ -30,10 +30,10 @@ def run_setup(config) -> None:
 
     # ── Step 1: Identity ──
     print("  ─── Step 1: Identity ───")
-    name = _ask("Agent name", config.get("agent_name", "Onyx"))
+    name = _ask("Agent name", config.get("agent_name", "Amethyst"))
     config.set("agent_name", name)
 
-    vibe = _ask("Personality (how should Onyx behave?)",
+    vibe = _ask("Personality (how should Amethyst behave?)",
                 config.get("agent_vibe", "") or "Helpful, efficient AI assistant")
     config.set("agent_vibe", vibe)
     print(f"  ✓ {name} will be: {vibe}")
@@ -67,7 +67,7 @@ def run_setup(config) -> None:
 
     # ── Step 3: Telegram Messenger ──
     print("  ─── Step 3: Messenger (optional) ───")
-    print("  Onyx can chat with you through messengers.")
+    print("  Amethyst can chat with you through messengers.")
     current_tg = config.get("messengers.telegram.token", "")
     if current_tg:
         print(f"  Telegram token already set: {current_tg[:8]}...")
@@ -87,13 +87,13 @@ def run_setup(config) -> None:
 
     # ── Step 4: Proactive Mode ──
     print("  ─── Step 4: Proactive Mode ───")
-    print("  Onyx can message you unprompted when idle.")
+    print("  Amethyst can message you unprompted when idle.")
     pro = _ask("Enable proactive check-ins?", "Y").lower()
     config.set("proactive.enabled", pro in ("y", "yes", ""))
     if config.get("proactive.enabled"):
-        print("  ✓ Onyx will check in ~every 30 min when idle (max 5/day)")
+        print("  ✓ Amethyst will check in ~every 30 min when idle (max 5/day)")
     else:
-        print("  Onyx will only reply when you message.")
+        print("  Amethyst will only reply when you message.")
     print()
 
     # ── Step 5: Notion (optional) ──
@@ -109,7 +109,7 @@ def run_setup(config) -> None:
 
     # ── Summary ──
     print("  ╔═══════════════════════════════════════╗")
-    print("  ║   ✅ Onyx Agent - Setup Complete!   ║")
+    print("  ║   ✅ Amethyst Agent - Setup Complete!   ║")
     print("  ╚═══════════════════════════════════════╝")
     print()
     print(f"  Agent:    {config.get('agent_name')}")
@@ -124,8 +124,8 @@ def run_setup(config) -> None:
     print("  Next steps:")
     if tg_on and config.get("messengers.telegram.token"):
         print("    1. Send /start to your bot on Telegram")
-    print(f"    1. Run: onyx start     (or: python3 onyx.py start)")
-    print(f"    2. Run: onyx dashboard (or: python3 onyx.py dashboard)")
+    print(f"    1. Run: amethyst start     (or: python3 amethyst.py start)")
+    print(f"    2. Run: amethyst dashboard (or: python3 amethyst.py dashboard)")
     print()
-    print("  Need help? Check: https://github.com/warecattravage-beep/onyx-agent-v3")
+    print("  Need help? Check: https://github.com/warecattravage-beep/amethyst-agent-v3")
     print()

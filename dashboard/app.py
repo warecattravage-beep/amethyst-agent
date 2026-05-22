@@ -1,5 +1,5 @@
 """
-✦ Onyx Dashboard - Native GUI App
+✦ Amethyst Dashboard - Native GUI App
 Cross-platform: Windows / Linux / Android (Termux)
 Built with Kivy - pure Python, no KV language.
 """
@@ -91,7 +91,7 @@ class StatusTab(BoxLayout):
             self.add_widget(row(label, v))
         self.add_widget(BoxLayout())  # spacer
         self.add_widget(styled_btn('▶ Launch Agent (terminal)', GREEN,
-                                   lambda b: self._info('Run: onyx start')))
+                                   lambda b: self._info('Run: amethyst start')))
 
     def _info(self, msg):
         Popup(title='Info', content=Label(text=msg), size_hint=(0.6, 0.3)).open()
@@ -259,11 +259,11 @@ class LogTab(BoxLayout):
 
 # ── App ──
 
-class OnyxDashboard(App):
+class AmethystDashboard(App):
     def __init__(self, config_path='config.json'):
         super().__init__()
         self.config = Config(config_path)
-        self.title = '✦ Onyx Agent'
+        self.title = '✦ Amethyst Agent'
         Window.size = (820, 620)
         Window.minimum_width, Window.minimum_height = 600, 400
         if hasattr(Window, 'clearcolor'):
@@ -282,7 +282,7 @@ class OnyxDashboard(App):
         title.bind(pos=lambda w, v: title.canvas.before.get_group('bg')[0].__setattr__('pos', v),
                    size=lambda w, v: title.canvas.before.get_group('bg')[0].__setattr__('size', v))
         # simpler: just use background color
-        title.add_widget(Label(text='✦ Onyx Agent', font_size=dp(18), bold=True,
+        title.add_widget(Label(text='✦ Amethyst Agent', font_size=dp(18), bold=True,
                                color=BLUE, halign='left'))
         self._root.add_widget(title)
 
@@ -317,7 +317,7 @@ def main():
     cfg_path = Path('config.json')
     if not cfg_path.exists():
         Config(str(cfg_path))
-    OnyxDashboard(str(cfg_path)).run()
+    AmethystDashboard(str(cfg_path)).run()
 
 
 if __name__ == '__main__':

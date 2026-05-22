@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Onyx Agent - CLI interface for Android Termux."""
+"""Amethyst Agent - CLI interface for Android Termux."""
 from __future__ import annotations
 
 import asyncio
@@ -18,14 +18,14 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
 )
-logger = logging.getLogger("onyx")
+logger = logging.getLogger("amethyst")
 
 
 async def interactive():
     """Interactive REPL mode."""
     agent = Agent()
 
-    print("\n✦ Onyx Agent - Gemma 4 E4B on Ollama")
+    print("\n✦ Amethyst Agent - Gemma 4 E4B on Ollama")
     print(f"  Model: {config.model}")
     print(f"  Tools loaded: {len(TOOL_REGISTRY)}")
     print(f"  Thinking mode: {'ON' if config.thinking else 'OFF'}")

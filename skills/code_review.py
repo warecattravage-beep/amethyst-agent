@@ -9,7 +9,7 @@ from typing import Any
 
 from core.skill import Skill
 
-log = logging.getLogger("onyx.skill.code_review")
+log = logging.getLogger("amethyst.skill.code_review")
 
 
 class CodeReviewSkill(Skill):

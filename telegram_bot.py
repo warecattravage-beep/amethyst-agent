@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Onyx Agent - Telegram bot interface.
+"""Amethyst Agent - Telegram bot interface.
 
 Run:  python telegram_bot.py <BOT_TOKEN>
 
@@ -21,7 +21,7 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
 )
-logger = logging.getLogger("onyx.telegram")
+logger = logging.getLogger("amethyst.telegram")
 
 
 class TelegramBot:
@@ -66,8 +66,8 @@ class TelegramBot:
         if text.startswith("/"):
             if text == "/start":
                 await self.send_message(chat_id,
-                    "✦ Onyx Agent\n\n"
-                    "Gemma 4 E4B running locally on your tablet.\n"
+                    "✦ Amethyst Agent\n\n"
+                    "Amethyst running locally on your device.\n"
                     "Send me a message and I'll think + act.\n"
                     "Commands: /reset, /tools, /model <name>, /help")
                 return

@@ -9,7 +9,7 @@ from pathlib import Path
 
 from core.messenger import Messenger
 
-log = logging.getLogger("onyx.telegram")
+log = logging.getLogger("amethyst.telegram")
 
 
 class TelegramMessenger(Messenger):

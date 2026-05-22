@@ -1,5 +1,5 @@
 """
-* Onyx Engine - Core message router and lifecycle manager.
+* Amethyst Engine - Core message router and lifecycle manager.
 """
 from __future__ import annotations
 
@@ -59,7 +59,7 @@ from skills.code_review import CodeReviewSkill
 from skills.project import ProjectSkill
 from skills.notion_skill import NotionSkill
 
-log = logging.getLogger("onyx.engine")
+log = logging.getLogger("amethyst.engine")
 
 MESSENGER_MAP = {
     "console": ConsoleMessenger,
@@ -88,7 +88,7 @@ SKILL_MAP = {
 }
 
 
-class OnyxEngine:
+class AmethystEngine:
     """Main engine - routes messages, manages lifecycle."""
 
     def __init__(self, config_path: str | Path = "config.json"):
@@ -130,12 +130,12 @@ class OnyxEngine:
                 "CRITICAL": "CRT",
             }
             NAME_COLORS = {
-                "onyx": "",
-                "onyx.engine": C.VIOLET,
-                "onyx.ollama": C.CYAN,
-                "onyx.telegram": C.GREEN,
-                "onyx.skill": C.YELLOW,
-                "onyx.memory": C.DIM,
+                "amethyst": "",
+                "amethyst.engine": C.VIOLET,
+                "amethyst.ollama": C.CYAN,
+                "amethyst.telegram": C.GREEN,
+                "amethyst.skill": C.YELLOW,
+                "amethyst.memory": C.DIM,
             }
 
             def format(self, record):
@@ -170,17 +170,17 @@ class OnyxEngine:
 
     def _print_banner(self):
         """Print the gateway ASCII art banner (no counts - just the art)."""
-        name = self.config.get("agent_name", "Onyx")
+        name = self.config.get("agent_name", "Amethyst")
         v = C.VIOLET; nc = C.NC; b = C.BOLD
         print()
-        print(f"{v}    ██████╗  ███╗  ██╗ ██╗  ██╗ ██╗  ██╗{nc}")
-        print(f"{v}   ██╔═══██╗ ████╗ ██║ ╚██╗ ██╔╝ ╚██╗██╔╝{nc}")
-        print(f"{v}   ██║   ██║ ██╔██╗██║  ╚████╔╝   ╚███╔╝{nc}")
-        print(f"{v}   ██║   ██║ ██║╚████║   ╚██╔╝    ██╔██╗{nc}")
-        print(f"{v}   ╚██████╔╝ ██║ ╚███║    ██║    ██╔╝ ██╗{nc}")
-        print(f"{v}    ╚═════╝  ╚═╝  ╚══╝    ╚═╝    ╚═╝  ╚═╝{nc}")
+        print(f"{v}       ╔═══╗  ╔════╗  ╔════╗  ╔═════╗  ╔═══╗  ╔════╗  ╔══════╗  ╔═════╗{nc}")
+        print(f"{v}       ║ ╔═╝  ╚═╗  ╚╗ ║ ╔══╝  ║ ╔═══╝  ║ ╔═╝  ║ ╔═╗ ║  ╚═╗  ╔═╝  ║ ╔═══╝{nc}")
+        print(f"{v}       ║ ╚═╗    ╚╗ ╔╝ ║ ╚══╗  ║ ║       ║ ╚═╗  ║ ║ ║ ║    ║ ║    ║ ║{nc}")
+        print(f"{v}       ║ ╔═╝     ║ ║  ║ ╔══╝  ║ ║       ║ ╔═╝  ║ ║ ║ ║    ║ ║    ║ ╚═══╗{nc}")
+        print(f"{v}       ║ ║      ╔╝ ╚╗ ║ ╚══╗  ║ ╚═══╗  ║ ║    ║ ╚═╝ ║   ╔╝ ╚╗   ║ ╚═══╝{nc}")
+        print(f"{v}       ╚═╝      ╚═══╝ ╚════╝  ╚═════╝  ╚═╝    ╚═══╝   ╚═══╝   ╚═════╝{nc}")
         print()
-        print(f"{b}       * {name} Agent Gateway *{nc}")
+        print(f"{b}          ✦ {name} Agent — Overwatch ✦{nc}")
         print()
 
     def _print_status_line(self):
@@ -265,6 +265,13 @@ class OnyxEngine:
             response = await self._handle_command(text, meta)
             if response:
                 await self._send(chat_id, response, source)
+            return
+
+        # Handle dashboard link request (saves a model call)
+        dashboard_phrases = ["show dashboard", "dashboard link", "open dashboard", "dash link", "show me the dash"]
+        if any(phrase in text.lower() for phrase in dashboard_phrases):
+            response = "✦ **Amethyst Dashboard**\n\nOpen in your browser:\n`http://localhost:9091`\n\nOr run: `python amethyst.py dashboard`"
+            await self._send(chat_id, response, source)
             return
 
         # Track activity time
@@ -355,7 +362,7 @@ class OnyxEngine:
         chat_id = meta.get("chat_id", "")
         skills_list = list(self.skills.keys())
         vibe = self.config.get("agent_vibe", "Helpful, efficient AI assistant")
-        system = self.model.system_prompt(skills_list, self.config.get("agent_name", "Onyx"))
+        system = self.model.system_prompt(skills_list, self.config.get("agent_name", "Amethyst"))
 
         messages = [{"role": "system", "content": f"{system}\n\nPersonality: {vibe}"}]
 
@@ -442,6 +449,8 @@ class OnyxEngine:
             return self._format_models()
         elif cmd == "/skills":
             return self._format_skills()
+        elif cmd == "/nextupdate":
+            return await self._handle_next_update()
         elif cmd == "/clear":
             self._memory.clear(chat_id)
             self._memory._dirty = True
@@ -460,7 +469,7 @@ class OnyxEngine:
 
     def _format_help(self) -> str:
         lines = [
-            f"*** {self.config.get('agent_name', 'Onyx')} Agent**",
+            f"*** {self.config.get('agent_name', 'Amethyst')} Agent**",
             "",
             "**Commands:**",
             "/help - This message",
@@ -489,7 +498,7 @@ class OnyxEngine:
         mins = int((uptime.total_seconds() % 3600) // 60)
         model_name = self.config.get("active_model", "none")
         return (
-            f"*** {self.config.get('agent_name', 'Onyx')} Status**\n\n"
+            f"*** {self.config.get('agent_name', 'Amethyst')} Status**\n\n"
             f"⏱ Uptime: {hours}h {mins}m\n"
             f"🧠 Model: {model_name}\n"
             f"💬 Messengers: {', '.join(self.messengers.keys()) or 'none'}\n"
@@ -529,6 +538,18 @@ class OnyxEngine:
             lines.append("")
 
         return "\n".join(lines)
+
+    async def _handle_next_update(self) -> str:
+        """Show time until next auto-update check."""
+        elapsed = time.time() - self._last_update_check
+        remaining = max(0, self._update_interval - elapsed)
+        if remaining < 60:
+            time_str = f"{int(remaining)} seconds"
+        else:
+            minutes = int(remaining // 60)
+            secs = int(remaining % 60)
+            time_str = f"{minutes}m {secs}s"
+        return f"🔄 Next auto-update check in **{time_str}**\n(checks every 30 min)"
 
     async def _handle_update(self) -> str:
         """Run git pull and update dependencies."""
@@ -610,6 +631,11 @@ class OnyxEngine:
                  len(self.skills), len(self.messengers))
         self._print_status_line()
 
+        # Print dashboard URL
+        print(f"{C.VIOLET}  Dashboard: {C.CYAN}http://localhost:9091{C.NC}")
+        print(f"{C.DIM}  (run `python amethyst.py dashboard` to open){C.NC}")
+        print()
+
         # Console input loop
         if self._console:
             asyncio.create_task(self._console_loop())
@@ -623,6 +649,8 @@ class OnyxEngine:
         asyncio.create_task(self._proactive_loop())
 
         # Auto-update loop (check every 30 min)
+        self._last_update_check = time.time()
+        self._update_interval = 1800
         asyncio.create_task(self._auto_update_loop())
 
         # Main message processing loop
@@ -741,7 +769,8 @@ class OnyxEngine:
         import subprocess
         repo = Path(__file__).resolve().parent.parent
         while self._running:
-            await asyncio.sleep(1800)
+            await asyncio.sleep(self._update_interval)
+            self._last_update_check = time.time()
             try:
                 r = subprocess.run(
                     ["git", "pull"], capture_output=True, text=True, timeout=30,
@@ -753,23 +782,23 @@ class OnyxEngine:
                         # Notify all messengers
                         for m in self.messengers.values():
                             try:
-                                await m.send("", "🔄 Onyx auto-updated - restarting...")
+                                await m.send("", "🔄 Amethyst auto-updated - restarting...")
                             except Exception:
                                 pass
                         log.info("Auto-update: restarting...")
                         self._running = False
                         # Replace process with fresh start
-                        os.execv(sys.executable, [sys.executable, str(repo / "onyx.py"), "start"])
+                        os.execv(sys.executable, [sys.executable, str(repo / "amethyst.py"), "start"])
             except Exception as e:
                 log.debug("Auto-update check failed: %s", e)
 
     async def _shutdown(self):
         """Gracefully shut down all components."""
-        log.info("* Onyx Agent shutting down...")
+        log.info("* Amethyst Agent shutting down...")
         self._memory.save()
         self._rag_memory.save()
         for messenger in self.messengers.values():
             await messenger.stop()
         if self.model and hasattr(self.model, "stop"):
             await self.model.stop()
-        log.info("* Onyx Agent stopped.")
+        log.info("* Amethyst Agent stopped.")

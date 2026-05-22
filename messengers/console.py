@@ -19,7 +19,7 @@ NC = "\033[0m"
 BOLD = "\033[1m"
 DIM = "\033[38;5;240m"
 
-log = logging.getLogger("onyx.console")
+log = logging.getLogger("amethyst.console")
 
 
 class ConsoleMessenger(Messenger):
@@ -29,7 +29,7 @@ class ConsoleMessenger(Messenger):
         super().__init__("console", config)
         self.rich = None
         self.use_rich = False
-        self.prompt = config.get("prompt", "onyx> ")
+        self.prompt = config.get("prompt", "amethyst> ")
 
     def _try_rich(self):
         """Try to load rich. Returns True if successful."""
@@ -53,13 +53,13 @@ class ConsoleMessenger(Messenger):
         self._running = True
         if self._try_rich():
             self.rich.print(self._Panel(
-                "✦ Onyx Agent - Console Mode\n"
+                "✦ Amethyst Agent - Console Mode\n"
                 "Type your messages. /help for commands, /quit to exit.",
-                title="Onyx",
+                title="Amethyst",
                 border_style="cyan",
             ))
         else:
-            print(f"\n{VIOLET}✦ Onyx Agent - Console Mode{NC}")
+            print(f"\n{VIOLET}✦ Amethyst Agent - Console Mode{NC}")
             print(f"{DIM}Type your messages. /help for commands, /quit to exit.{NC}")
         log.info("Console messenger started")
 
@@ -77,12 +77,12 @@ class ConsoleMessenger(Messenger):
             self.rich.print()
             self.rich.print(self._Panel(
                 self._Markdown(text),
-                title="Onyx",
+                title="Amethyst",
                 border_style="green",
             ))
             self.rich.print()
         else:
-            print(f"\n{GREEN}─── {BOLD}Onyx{NC}{GREEN} ───{NC}\n{text}\n{DIM}────────────{NC}\n")
+            print(f"\n{GREEN}─── {BOLD}Amethyst{NC}{GREEN} ───{NC}\n{text}\n{DIM}────────────{NC}\n")
 
     async def read_input(self) -> str | None:
         """Read a single line of input."""

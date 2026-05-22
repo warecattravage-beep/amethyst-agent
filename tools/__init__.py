@@ -1,4 +1,4 @@
-"""Built-in tools for the Onyx agent.
+"""Built-in tools for the Amethyst agent.
 
 Each tool module exports:
 - `tool_spec` - JSON schema dict (Ollama tools format)

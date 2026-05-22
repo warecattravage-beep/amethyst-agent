@@ -1,1 +1,1 @@
-"""✦ Onyx Agent - Core module."""
+"""✦ Amethyst Agent - Core module."""

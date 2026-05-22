@@ -8,7 +8,7 @@ from typing import Any
 
 from core.model import Model
 
-log = logging.getLogger("onyx.openai")
+log = logging.getLogger("amethyst.openai")
 
 
 class OpenAIModel(Model):

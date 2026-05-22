@@ -8,7 +8,7 @@ from typing import Any
 
 from core.model import Model
 
-log = logging.getLogger("onyx.ollama")
+log = logging.getLogger("amethyst.ollama")
 
 
 class OllamaModel(Model):

@@ -1,5 +1,5 @@
 """
-✦ Onyx Skill Base - Interface for all skills.
+✦ Amethyst Skill Base - Interface for all skills.
 """
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ import logging
 from abc import ABC, abstractmethod
 from typing import Any
 
-log = logging.getLogger("onyx.skill")
+log = logging.getLogger("amethyst.skill")
 
 
 class Skill(ABC):

@@ -1,1 +1,1 @@
-"""✦ Onyx Agent - Models module."""
+"""✦ Amethyst Agent - Models module."""

@@ -1,1 +1,1 @@
-"""✦ Onyx Agent - Skills module."""
+"""✦ Amethyst Agent - Skills module."""

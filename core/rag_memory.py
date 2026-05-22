@@ -13,7 +13,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
-log = logging.getLogger("onyx.rag_memory")
+log = logging.getLogger("amethyst.rag_memory")
 
 # Path to the searchable memory text file
 MEMORY_FILE = "data/rag_memory.txt"

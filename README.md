@@ -1,4 +1,4 @@
-# ✦ Onyx Agent Gateway
+# ✦ Amethyst Agent Gateway
 
 > **Your own personal AI agent — runs entirely on your machine.**
 > Multi-messenger, multi-model, plugin skills, configurable persona, and proactive conversation. All local, all yours.
@@ -10,7 +10,7 @@
    ██║   ██║ ██║╚████║   ╚██╔╝    ██╔██╗
    ╚██████╔╝ ██║ ╚███║    ██║    ██╔╝ ██╗
     ╚═════╝  ╚═╝  ╚══╝    ╚═╝    ╚═╝  ╚═╝
-           ✦ Onyx Agent Gateway ✦
+           ✦ Amethyst Agent Gateway ✦
 ```
 
 ---
@@ -50,7 +50,7 @@ Remembers past messages per chat (up to 10 exchanges). Ask a question, follow up
 ### 🖥️ Dashboards
 - **Desktop (Linux/Windows):** Kivy native GUI
 - **Termux (Android):** Web dashboard at `localhost:9091`
-- **CLI:** `onyx status` for quick overview
+- **CLI:** `amethyst status` for quick overview
 
 ### 🎨 Visual Polish
 - Violet-colored ASCII art banner on startup
@@ -63,23 +63,23 @@ Remembers past messages per chat (up to 10 exchanges). Ask a question, follow up
 
 **Linux / Termux:**
 ```bash
-git clone https://github.com/warecattravage-beep/onyx-agent-v3.git
-cd onyx-agent-v3
+git clone https://github.com/warecattravage-beep/amethyst-agent-v3.git
+cd amethyst-agent-v3
 bash install.sh
-onyx setup
-onyx start
+amethyst setup
+amethyst start
 ```
 
 **Windows:**
 ```powershell
-git clone https://github.com/warecattravage-beep/onyx-agent-v3.git
-cd onyx-agent-v3
+git clone https://github.com/warecattravage-beep/amethyst-agent-v3.git
+cd amethyst-agent-v3
 pip install httpx kivy openai
-python onyx.py setup
-python onyx.py start
+python amethyst.py setup
+python amethyst.py start
 ```
 
-> After `bash install.sh`, the `onyx` command is available system-wide.
+> After `bash install.sh`, the `amethyst` command is available system-wide.
 > On Termux: runs via web dashboard at `http://localhost:9091`
 
 ---
@@ -88,13 +88,13 @@ python onyx.py start
 
 | Command | What it does |
 |---|---|
-| `onyx setup` | 🎯 Step-by-step onboarding wizard (identity, model, Telegram, proactive, Notion) |
-| `onyx start` | ▶️ Launch the agent gateway |
-| `onyx dashboard` | 🖥️ Open GUI or web dashboard |
-| `onyx dashboard --web` | 🌐 Force web dashboard |
-| `onyx status` | 📊 CLI overview |
-| `onyx config` | 📝 Edit config.json |
-| `onyx logs` | 📋 View recent logs |
+| `amethyst setup` | 🎯 Step-by-step onboarding wizard (identity, model, Telegram, proactive, Notion) |
+| `amethyst start` | ▶️ Launch the agent gateway |
+| `amethyst dashboard` | 🖥️ Open GUI or web dashboard |
+| `amethyst dashboard --web` | 🌐 Force web dashboard |
+| `amethyst status` | 📊 CLI overview |
+| `amethyst config` | 📝 Edit config.json |
+| `amethyst logs` | 📋 View recent logs |
 
 **While running:**
 - `/help` — Show commands
@@ -109,17 +109,17 @@ python onyx.py start
 
 ## 🧠 Persona Setup
 
-During `onyx setup`, you'll be asked:
+During `amethyst setup`, you'll be asked:
 
 ```
-Persona — How should Onyx behave?
+Persona — How should Amethyst behave?
   Examples:
     'Friendly coding buddy who explains everything simply'
     'Efficient sysadmin — short answers, no fluff'
     'Creative storyteller with a dark sense of humor'
 ```
 
-This becomes the agent's personality in every response. Change it anytime by editing `agent_vibe` in `config.json` or re-running `onyx setup`.
+This becomes the agent's personality in every response. Change it anytime by editing `agent_vibe` in `config.json` or re-running `amethyst setup`.
 
 ---
 
@@ -127,7 +127,7 @@ This becomes the agent's personality in every response. Change it anytime by edi
 
 ```json
 "messengers": {
-  "console":  {"enabled": true,  "prompt": "onyx> "},
+  "console":  {"enabled": true,  "prompt": "amethyst> "},
   "telegram": {"enabled": true,  "token": "7865432:AAHd8s9a..."},
   "discord":  {"enabled": false, "token": ""},
   "signal":   {"enabled": false, "cli_path": "signal-cli", "account": ""}
@@ -176,10 +176,10 @@ Configurable in `config.json` under `"proactive"` or toggle during setup.
 
 | Platform | Type | Launch |
 |---|---|---|
-| 🐧 Linux | Kivy GUI | `onyx dashboard` |
-| 🪟 Windows | Kivy GUI | `onyx dashboard` |
-| 📱 Termux | 🌐 Web UI | `onyx dashboard` → `localhost:9091` |
-| 🌐 Any | Web UI | `onyx dashboard --web` |
+| 🐧 Linux | Kivy GUI | `amethyst dashboard` |
+| 🪟 Windows | Kivy GUI | `amethyst dashboard` |
+| 📱 Termux | 🌐 Web UI | `amethyst dashboard` → `localhost:9091` |
+| 🌐 Any | Web UI | `amethyst dashboard --web` |
 
 The web dashboard is a full SPA with tabs for Status, Messengers, Models, Skills, Config, and Logs — zero extra dependencies.
 
@@ -188,8 +188,8 @@ The web dashboard is a full SPA with tabs for Status, Messengers, Models, Skills
 ## 🏗️ Architecture
 
 ```
-📁 onyx-agent/
-├── 📄 onyx.py              CLI entry (also at $PREFIX/bin/onyx)
+📁 amethyst-agent/
+├── 📄 amethyst.py              CLI entry (also at $PREFIX/bin/amethyst)
 ├── 📄 config.json          All settings
 ├── 📄 install.sh           Cross-platform installer
 │
@@ -233,28 +233,28 @@ The web dashboard is a full SPA with tabs for Status, Messengers, Models, Skills
 **Linux:**
 ```bash
 sudo apt install python3 python3-pip git
-git clone https://github.com/warecattravage-beep/onyx-agent-v3.git
-cd onyx-agent-v3
+git clone https://github.com/warecattravage-beep/amethyst-agent-v3.git
+cd amethyst-agent-v3
 bash install.sh
 ```
 
 **Windows:**
 ```powershell
 pip install httpx kivy openai
-git clone https://github.com/warecattravage-beep/onyx-agent-v3.git
-cd onyx-agent-v3
-python onyx.py setup
-python onyx.py start
+git clone https://github.com/warecattravage-beep/amethyst-agent-v3.git
+cd amethyst-agent-v3
+python amethyst.py setup
+python amethyst.py start
 ```
 
 **Termux (Android):**
 ```bash
 pkg install python git
-git clone https://github.com/warecattravage-beep/onyx-agent-v3.git
-cd onyx-agent-v3
+git clone https://github.com/warecattravage-beep/amethyst-agent-v3.git
+cd amethyst-agent-v3
 bash install.sh
-onyx setup
-onyx start
+amethyst setup
+amethyst start
 # Dashboard: http://localhost:9091
 ```
 

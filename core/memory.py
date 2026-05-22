@@ -1,5 +1,5 @@
 """
-✦ Onyx Memory - Conversation history manager.
+✦ Amethyst Memory - Conversation history manager.
 Stores per-chat message history and trims to keep context size manageable.
 """
 from __future__ import annotations
@@ -10,7 +10,7 @@ import time
 from pathlib import Path
 from typing import Any
 
-log = logging.getLogger("onyx.memory")
+log = logging.getLogger("amethyst.memory")
 
 MAX_HISTORY = 20  # max messages to keep per chat
 MAX_AGE = 86400 * 7  # 7 days
