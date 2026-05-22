@@ -171,14 +171,19 @@ class AmethystEngine:
     def _print_banner(self):
         """Print the gateway ASCII art banner."""
         name = self.config.get("agent_name", "Amethyst")
-        v = C.VIOLET; nc = C.NC; b = C.BOLD
+        v = C.VIOLET; nc = C.NC
+        banner = (
+            '  ___  ___  ___ _____ _____ _   ___   _______ _____ \n'
+            ' / _ \\ |  \\/  ||  ___|_   _| | | \\ \\ / /  ___|_   _|\n'
+            '/ /_\\ \\| .  . || |__   | | | |_| |\\ V /\\ `--.  | |  \n'
+            '|  _  || |\\/| ||  __|  | | |  _  | \\ /  `--. \\ | |  \n'
+            '| | | || |  | || |___  | | | | | | | | /\\__/ / | |  \n'
+            '\\_| |_/\\_|  |_/\\____/  \\_/ \\_| |_/ \\_/ \\____/  \\_/  \n'
+        )
         print()
-        print(f"{v}    ___    __  _________________  ____  _____________{nc}")
-        print(f"{v}   /   |  /  |/  / ____/_  __/ / / /\ \/ / ___/_  __/{nc}")
-        print(f"{v}  / /| | / /|_/ / __/   / / / /_/ /  \  /\__ \ / /   {nc}")
-        print(f"{v} / ___ |/ /  / / /___  / / / __  /   / /___/ // /    {nc}")
-        print(f"{v}/_/  |_/_/  /_/_____/ /_/ /_/ /_/   /_//____//_/     {nc}")
-        print(f"{v}                  \u2726 {name} Agent{nc}")
+        for line in banner.split('\n'):
+            print(v + line + nc)
+        print(v + '               \u2726 ' + name + ' Agent' + nc)
         print()
 
     def _print_status_line(self):
