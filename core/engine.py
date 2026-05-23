@@ -280,14 +280,10 @@ class AmethystEngine:
         # Track activity time
         self._last_msg_time = time.time()
 
-        # Store user message in memory
-        self._memory.add(chat_id, "user", text)
-        self._rag_memory.add("user", text, chat_id)
-
         # Show typing indicator
         await self._send_action(chat_id, source)
 
-        # Build initial context
+        # Build initial context (user message NOT stored yet - avoids doubles)
         messages = self._build_messages(text, meta)
 
         if not self.model:
@@ -353,7 +349,9 @@ class AmethystEngine:
         if not final_response:
             final_response = f"(Done after {max_steps} steps)"
 
-        # Store final response in memory
+        # Store user query then final response in memory
+        self._memory.add(chat_id, "user", text)
+        self._rag_memory.add("user", text, chat_id)
         self._memory.add(chat_id, "assistant", final_response)
         self._rag_memory.add("assistant", final_response, chat_id)
 
