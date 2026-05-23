@@ -47,9 +47,21 @@ class OllamaModel(Model):
         if not self._http:
             return "Error: Ollama not connected."
         try:
+            # Separate out images from user messages for Ollama's format
+            # Ollama expects: {"role":"user","content":"...","images":["<b64>"]}
+            ollama_messages = []
+            for msg in messages:
+                m = dict(msg)  # copy
+                # If this message has images, move them to the proper Ollama field
+                if "images" in m and m["images"]:
+                    m["images"] = m.pop("images")
+                elif "images" in m:
+                    del m["images"]
+                ollama_messages.append(m)
+
             payload = {
                 "model": self.model,
-                "messages": messages,
+                "messages": ollama_messages,
                 "stream": False,
                 "options": {
                     "temperature": kwargs.get("temperature", 0.7),

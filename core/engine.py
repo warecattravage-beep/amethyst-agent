@@ -377,8 +377,13 @@ class AmethystEngine:
         # Include recent conversation history
         history = self._memory.get_context(chat_id, max_msgs=10)
         messages.extend(history)
-        # Add current user message
-        messages.append({"role": "user", "content": text})
+
+        # Add current user message (with optional image data)
+        user_msg = {"role": "user", "content": text}
+        images = meta.get("images")
+        if images:
+            user_msg["images"] = images
+        messages.append(user_msg)
         return messages
 
     async def _process_skill_calls(self, response: str) -> str:

@@ -3,6 +3,7 @@
 """
 from __future__ import annotations
 
+import base64
 import logging
 from typing import Any
 from pathlib import Path
@@ -97,6 +98,24 @@ class TelegramMessenger(Messenger):
             action=action,
         )
 
+    async def _download_file(self, file_id: str) -> bytes | None:
+        """Download a file from Telegram by file_id, return raw bytes."""
+        if not self._http:
+            return None
+        try:
+            # Get file path from Telegram
+            result = await self._api("getFile", file_id=file_id)
+            if not result or "file_path" not in result:
+                return None
+            file_path = result["file_path"]
+            url = f"https://api.telegram.org/file/bot{self.token}/{file_path}"
+            r = await self._http.get(url, timeout=30)
+            if r.status_code == 200:
+                return r.content
+        except Exception as e:
+            log.debug("Telegram file download error: %s", e)
+        return None
+
     async def poll(self):
         """Long-poll for incoming messages."""
         if not self._running:
@@ -113,11 +132,42 @@ class TelegramMessenger(Messenger):
             self._offset = update["update_id"] + 1
             msg = update.get("message", {})
             chat_id = msg.get("chat", {}).get("id")
+            if not chat_id:
+                continue
+
             text = (msg.get("text") or "").strip()
-            if chat_id and text:
-                await self._handle(text, {
+            images = []
+
+            # Check for photo messages
+            if "photo" in msg:
+                # Pick the largest photo (last in array)
+                largest = msg["photo"][-1]
+                file_bytes = await self._download_file(largest["file_id"])
+                if file_bytes:
+                    b64 = base64.b64encode(file_bytes).decode("utf-8")
+                    images.append(b64)
+                    if not text:
+                        text = "What's in this image?"
+
+            # Check for document messages (especially images)
+            if "document" in msg:
+                doc = msg["document"]
+                mime = (doc.get("mime_type") or "").lower()
+                if mime.startswith("image/"):
+                    file_bytes = await self._download_file(doc["file_id"])
+                    if file_bytes:
+                        b64 = base64.b64encode(file_bytes).decode("utf-8")
+                        images.append(b64)
+                        if not text:
+                            text = f"What's in this {'photo' if mime == 'image/png' else 'image'}?"
+
+            if chat_id and (text or images):
+                meta = {
                     "source": "telegram",
                     "chat_id": str(chat_id),
                     "sender": msg.get("from", {}).get("first_name", "?"),
                     "message_id": msg.get("message_id"),
-                })
+                }
+                if images:
+                    meta["images"] = images
+                await self._handle(text, meta)
